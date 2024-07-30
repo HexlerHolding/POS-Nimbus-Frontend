@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
-import Logo from "../../Assets/LogoWhite.png";
-import pfp2 from "../../Assets/pfp2.jpeg";
+import Logo from "../Assets/LogoWhite.png";
+import pfp2 from "../Assets/pfp2.jpeg";
 import { HiUserGroup } from "react-icons/hi";
 import { AiOutlineBranches } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 
-import Dashboard from "./page";
-import Order from "./Orders/order";
-import ManagerManagement from "./ManagerManagement/page";
-import BranchPage from "./BranchManagement/ViewBranches";
-import ProductPage from "./Product/page";
 
-const DashboardLayout = () => {
+
+import CashierManagement from "./Dashboard/cashierManagement";
+
+const ManagerDashboardLayout = () => {
   const [show, handleShow] = useState(false);
 
   const [showUser, handleShowUser] = useState(false);
@@ -120,11 +118,7 @@ const DashboardLayout = () => {
               </div>
             </div>
           </div>
-          {selected === "Dashboard" ? <Dashboard /> : null}
-          {selected === "Orders" ? <Order /> : null}
-          {selected === "Manager Management" ? <ManagerManagement /> : null}
-          {selected === "Branch Management" ? <BranchPage /> : null}
-          {selected === "Products" ? <ProductPage /> : null}
+          {selected === "Cashier Management" && <CashierManagement />}
         </nav>
       </div>
       <div
@@ -217,11 +211,11 @@ const DashboardLayout = () => {
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                onClick={() => setSelected("Manager Management")}
+                onClick={() => setSelected("Cashier Management")}
               >
                 <HiUserGroup className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
 
-                <span className="ms-3">Manager Management</span>
+                <span className="ms-3">Cashier Management</span>
               </a>
             </li>
 
@@ -290,4 +284,4 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+export default ManagerDashboardLayout;

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { BiWorld } from "react-icons/bi";
 import { FaChartLine } from "react-icons/fa";
 import { AiOutlineClockCircle } from "react-icons/ai";
-import Logo from "../../Assets/Logo.png";
-import Navbar from "../../Components/Navbar";
+import Logo from "../Assets/Logo.png";
+import Navbar from "../Components/Navbar";
 
 const advantages = [
   {
@@ -28,7 +28,7 @@ const advantages = [
       "Get real-time updates on your business performance with our easy to use dashboard.",
   },
 ];
-const AdminLogin = () => {
+const UserLogin = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -40,8 +40,10 @@ const AdminLogin = () => {
   return (
     <div className="text-center flex flex-col  items-center justify-center">
       <Navbar />
-      <div className="m-10 p-10 pt-2 w-1/3">
-        <h1 className="text-2xl text-blue-500 mb-3">Admin Login</h1>
+      <div className="m-10 p-10 w-1/3">
+        <h1 className="text-2xl text-blue-500 mb-10">
+          Login as Cashier or Manager
+        </h1>
 
         <div className="flex flex-col justify-center gap-10">
           <div className="flex flex-col w-full">
@@ -103,4 +105,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default UserLogin;
