@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import CashierViews from "./cashierView";
 
 const CashierManagement = () => {
   const [username, setUsername] = useState("");
@@ -17,9 +18,12 @@ const CashierManagement = () => {
   }, []);
 
   return (
-    <div className="text-center flex flex-col  items-center justify-center min-h-screen">
-      <div className="m-10 p-10 pt-2 w-1/3">
-        <h1 className="text-2xl text-blue-500 mb-3">Cashier Management</h1>
+    <div className="text-center flex justify-center min-h-screen">
+      <div className="m-10 p-10 w-1/2">
+        <h1 className="text-2xl text-blue-500 mb-3">Add Cashier</h1>
+        <p class="text-gray-500 dark:text-gray-400 mb-10">
+          Add a new cashier to the system
+        </p>
         <div className="flex flex-col justify-center gap-10">
           <div className="flex flex-col w-full">
             <h1 className="text-left text-black text-md">Username</h1>
@@ -48,6 +52,9 @@ const CashierManagement = () => {
             Add Cashier
           </button>
         </div>
+      </div>
+      <div>
+        <CashierViews className="w-1/2" />
       </div>
     </div>
   );

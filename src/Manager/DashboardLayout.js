@@ -5,16 +5,17 @@ import { HiUserGroup } from "react-icons/hi";
 import { AiOutlineBranches } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 
-
-
-import CashierManagement from "./Dashboard/cashierManagement";
-
+import CashierManagement from "./Dashboard/cashierAddtion";
+import CashierViews from "./Dashboard/cashierView";
+import ProductPage from "./Dashboard/Product/page";
+import Orders from "./Dashboard/OrdersShow/page";
+import Order from "./Dashboard/Orders/order";
 const ManagerDashboardLayout = () => {
   const [show, handleShow] = useState(false);
 
   const [showUser, handleShowUser] = useState(false);
 
-  const [selected, setSelected] = useState("Orders");
+  const [selected, setSelected] = useState("Dashboard");
 
   return (
     <div className="">
@@ -118,7 +119,11 @@ const ManagerDashboardLayout = () => {
               </div>
             </div>
           </div>
-          {selected === "Cashier Management" && <CashierManagement />}
+          {selected === "Add Cashier" && <CashierManagement />}
+          {selected === "View Cashier" && <CashierViews />}
+          {selected === "Orders" && <Orders />}
+          {selected === "Products" && <ProductPage />}
+          {selected === "Dashboard" && <Order />}
         </nav>
       </div>
       <div
@@ -211,11 +216,11 @@ const ManagerDashboardLayout = () => {
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                onClick={() => setSelected("Cashier Management")}
+                onClick={() => setSelected("Add Cashier")}
               >
                 <HiUserGroup className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
 
-                <span className="ms-3">Cashier Management</span>
+                <span className="ms-3">Add Cashier</span>
               </a>
             </li>
 
@@ -223,10 +228,10 @@ const ManagerDashboardLayout = () => {
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                onClick={() => setSelected("Branch Management")}
+                onClick={() => setSelected("View Cashier")}
               >
                 <AiOutlineBranches className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
-                <span className="ms-3">Branch Management</span>
+                <span className="ms-3">View Cashier</span>
               </a>
             </li>
 

@@ -7,6 +7,7 @@ import UserLogin from "./UserLogin/page";
 import DashboardLayout from "./Admin/Dashboard/DashboardLayout";
 import CashierDashboardLayout from "./Cashier/Dashboard/DashboardLayout";
 import ManagerDashboardLayout from "./Manager/DashboardLayout";
+import Orders from "./Kitchen/Orders/page";
 
 
 const Layout = () => {
@@ -17,6 +18,7 @@ const Layout = () => {
       <Route path="/admin/dashboard" element={<DashboardLayout />} />
       <Route path="/cashier/dashboard" element={<CashierDashboardLayout />} />
       <Route path="/manager/dashboard" element={<ManagerDashboardLayout />} />
+      <Route path="/kitchen/orders" element={<Orders />} />
     </Routes>
   );
 };
