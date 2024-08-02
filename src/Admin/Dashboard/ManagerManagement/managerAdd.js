@@ -1,11 +1,77 @@
 import React, { useState, useEffect } from "react";
+import AdminService from "../../../Services/adminService";
+import { clear } from "@testing-library/user-event/dist/clear";
 
 const ManagerAdd = () => {
-  const [branches, setBranches] = useState([
-    "Branch 1",
-    "Branch 2",
-    "Branch 3",
-  ]);
+  const [branches, setBranches] = useState([]);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("");
+
+  useEffect(() => {
+    AdminService.getBranches().then((res) => {
+      console.log(res.data);
+      setBranches(res.data);
+    });
+  }, []);
+
+  const clearForm = () => {
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setFirstName("");
+    setLastName("");
+    setPhone("");
+    setSelectedBranch("");
+  };
+
+  const handleManagerAdd = (e) => {
+    try {
+      e.preventDefault();
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match");
+        return;
+      }
+
+      const manager = {
+        branchName: selectedBranch,
+        username: username,
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        contact: phone,
+      };
+
+      AdminService.addManager(manager).then((res) => {
+        console.log(res.data);
+        if (res.data === "error") {
+          alert("Error adding manager");
+        } else {
+          alert("Manager added successfully");
+          setUsername("");
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
+          setFirstName("");
+          setLastName("");
+          setPhone("");
+          setSelectedBranch("");
+
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <form className="p-20 min-h-screen">
       <h1 className="text-2xl text-blue-500 mb-2">Add Manager</h1>
@@ -14,12 +80,32 @@ const ManagerAdd = () => {
       </p>
       <div className="relative z-0 w-full mb-5 group">
         <input
+          type="text"
+          name="floating_username"
+          id="floating_username"
+          className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          placeholder=" "
+          required
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <label
+          for="floating_username"
+          className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+        >
+          Username
+        </label>
+      </div>
+      <div className="relative z-0 w-full mb-5 group">
+        <input
           type="email"
           name="floating_email"
           id="floating_email"
           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           placeholder=" "
           required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <label
           for="floating_email"
@@ -36,6 +122,8 @@ const ManagerAdd = () => {
           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           placeholder=" "
           required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <label
           for="floating_password"
@@ -52,6 +140,8 @@ const ManagerAdd = () => {
           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           placeholder=" "
           required
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
         <label
           for="floating_repeat_password"
@@ -69,6 +159,8 @@ const ManagerAdd = () => {
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             placeholder=" "
             required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
           />
           <label
             for="floating_first_name"
@@ -85,6 +177,8 @@ const ManagerAdd = () => {
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             placeholder=" "
             required
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
           />
           <label
             for="floating_last_name"
@@ -104,6 +198,8 @@ const ManagerAdd = () => {
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             placeholder=" "
             required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <label
             for="floating_phone"
@@ -116,13 +212,19 @@ const ManagerAdd = () => {
           <select
             className="block py-2.5 px-2 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             required
+            value={selectedBranch}
+            onChange={(e) => setSelectedBranch(e.target.value)}
           >
             <option value="" disabled selected classNameName="p-2">
               Select Branch
             </option>
             {branches.map((branch) => (
-              <option value={branch} classNameName="p-2">
-                {branch}
+              <option
+                id={branch._id}
+                value={branch.branch_name}
+                classNameName="p-2"
+              >
+                {branch.branch_name}
               </option>
             ))}
           </select>
@@ -131,6 +233,7 @@ const ManagerAdd = () => {
       <button
         type="submit"
         className="mt-5 w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        onClick={handleManagerAdd}
       >
         Submit
       </button>

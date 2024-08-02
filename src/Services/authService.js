@@ -1,6 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "./url";
-// const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const handleResponse = async (response) => {
   if (response.status >= 200 && response.status < 300) {

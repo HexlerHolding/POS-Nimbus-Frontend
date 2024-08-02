@@ -42,11 +42,11 @@ const ViewBranches = ({ branches }) => {
                 <td class="px-6 py-4">{branch.branch_name}</td>
                 <td class="px-6 py-4">{branch.address}</td>
                 <td class="px-6 py-4">{branch.contact}</td>
-                <td class="px-6 py-4">{branch.shift_status}</td>
+                <td class="px-6 py-4">{branch.shift_status ? "Open" : "Closed"}</td>
                 <td class="px-6 py-4">{branch.opening_time}</td>
                 <td class="px-6 py-4">{branch.closing_time}</td>
                 <td class="px-6 py-4">{branch.branch_sales}/-</td>
-                <td class="px-6 py-4">{branch.branch_cash_on_hand}/-</td>
+                <td class="px-6 py-4">{branch.cash_on_hand}/-</td>
               </tr>
             ))}
           </tbody>
