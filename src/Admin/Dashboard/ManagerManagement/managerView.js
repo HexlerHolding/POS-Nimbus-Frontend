@@ -1,24 +1,32 @@
 import React, { useState, useEffect } from "react";
-import Managers from "./data";
+// import Managers from "./data";
+import AdminService from "../../../Services/adminService";
 
 const ManagerView = () => {
-  const [branches, setBranches] = useState([
-    "Branch 1",
-    "Branch 2",
-    "Branch 3",
-  ]);
+  const [branches, setBranches] = useState([]);
 
   const [selectedManagers, setSelectedManagers] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState("all");
 
   useEffect(() => {
-    if (selectedBranch === "all") {
-      setSelectedManagers(Managers);
-      return;
-    }
-    setSelectedManagers(
-      Managers.filter((manager) => manager.branch_name === selectedBranch)
-    );
+    AdminService.getBranches().then((res) => {
+      console.log(res.data);
+      setBranches(res.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    AdminService.getManagers().then((res) => {
+      console.log(res.data);
+
+      if (selectedBranch === "all") {
+        setSelectedManagers(res.data);
+      } else {
+        setSelectedManagers(
+          res.data.filter((manager) => manager.branch_name === selectedBranch)
+        );
+      }
+    });
   }, [selectedBranch]);
 
   return (
@@ -38,7 +46,7 @@ const ManagerView = () => {
           <option value="all">All</option>
 
           {branches.map((branch) => (
-            <option value={branch}>{branch}</option>
+            <option value={branch._id}>{branch.branch_name}</option>
           ))}
         </select>
         <label
@@ -65,12 +73,12 @@ const ManagerView = () => {
         </thead>
         <tbody>
           {selectedManagers.map((manager) => (
-            <tr class="bg-white dark:bg-gray-800" key={manager.id}>
+            <tr class="bg-white dark:bg-gray-800" key={manager._id}>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="ml-4">
                     <div class="text-sm font-medium text-gray-900 dark:text-gray-400">
-                      {manager.id}
+                      {manager._id}
                     </div>
                   </div>
                 </div>
@@ -81,7 +89,7 @@ const ManagerView = () => {
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {manager.branch_name}
+                {manager.branch_id.branch_name}
               </td>
             </tr>
           ))}

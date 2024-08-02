@@ -4,6 +4,7 @@ import { FaChartLine } from "react-icons/fa";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import Logo from "../../Assets/Logo.png";
 import Navbar from "../../Components/Navbar";
+import AuthService from "../../Services/authService";
 
 const advantages = [
   {
@@ -35,6 +36,10 @@ const AdminLogin = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(name, password);
+
+    AuthService.adminLogin(name, password).then((res) => {
+      console.log(res);
+    });
   };
 
   return (
@@ -61,7 +66,7 @@ const AdminLogin = () => {
               placeholder="Password"
               value={password}
               className="p-2 border border-gray-300 rounded-xl"
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
         </div>
