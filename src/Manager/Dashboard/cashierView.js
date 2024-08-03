@@ -1,41 +1,28 @@
 import React, { useState, useEffect } from "react";
-
-const data = [
-  {
-    id: 1,
-    username: "cashier1",
-    password: "cashier1",
-    branch: "branch1",
-    joining_date: "2021-10-10",
-  },
-  {
-    id: 2,
-    username: "cashier2",
-    password: "cashier2",
-    branch: "branch2",
-    joining_date: "2021-10-10",
-  },
-  {
-    id: 3,
-    username: "cashier3",
-    password: "cashier3",
-    branch: "branch3",
-    joining_date: "2021-10-10",
-  },
-];
-
+import managerService from "../../Services/managerService";
+import commonService from "../../Services/common";
 const CashierViews = () => {
-  const [cashiers, setCashiers] = useState(data);
+  const [cashiers, setCashiers] = useState([]);
+  const [branchName, setBranchName] = useState("");
+  const [submitPressed, setSubmitPressed] = useState(false);
+
+  const fetchCashiers = async () => {
+    const response = await managerService.getCashiers();
+
+    setSubmitPressed(!submitPressed);
+    console.log(response);
+    if (response.data) {
+      setCashiers(response.data.cashiers);
+      setBranchName(response.data.branchName);
+    }
+  };
 
   useEffect(() => {
-    console.log("Component Mounted");
-    return () => {
-      console.log("Component Unmounted");
-    };
-  }, []);
+    fetchCashiers();
+  }, [submitPressed]);
 
   return (
-    <div class="relative overflow-x-auto p-10 m-10 min-h-screen">
+    <div class="relative overflow-x-auto p-10 mt-10 min-h-screen">
       <h1 class="text-2xl text-blue-500 mb-2">View Cashiers</h1>
       <p class="text-gray-500 dark:text-gray-400 mb-10">
         View all cashiers in a branch
@@ -63,12 +50,12 @@ const CashierViews = () => {
         </thead>
         <tbody class="bg-gray-800 divide-y dark:divide-gray-700">
           {cashiers.map((cashier) => (
-            <tr key={cashier.id}>
+            <tr key={cashier._id}>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="ml-4">
                     <div class="text-sm font-medium text-gray-200">
-                      {cashier.id}
+                      {commonService.handleID(cashier._id)}
                     </div>
                   </div>
                 </div>
@@ -77,13 +64,15 @@ const CashierViews = () => {
                 <div class="text-sm text-gray-300">{cashier.username}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-300">{cashier.branch}</div>
+                <div class="text-sm text-gray-300">{branchName}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-300">{cashier.joining_date}</div>
+                <div class="text-sm text-gray-300">
+                  {cashier.joining_date.split("T")[0]}
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-300">Coming Soon</div>
+                <div class="text-sm text-gray-300">Feature Coming Soon</div>
               </td>
             </tr>
           ))}

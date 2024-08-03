@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CashierViews from "./cashierView";
+import managerService from "../../Services/managerService";
 
 const CashierManagement = () => {
   const [username, setUsername] = useState("");
@@ -7,15 +8,17 @@ const CashierManagement = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(username, password);
+    managerService.addCashier(username, password).then((res) => {
+      console.log(res);
+      if (res === "error") {
+        alert("Error adding cashier");
+      } else {
+        alert("Cashier Added Successfully");
+        setUsername("");
+        setPassword("");
+      }
+    });
   };
-
-  useEffect(() => {
-    console.log("Component Mounted");
-    return () => {
-      console.log("Component Unmounted");
-    };
-  }, []);
 
   return (
     <div className="text-center flex justify-center min-h-screen">

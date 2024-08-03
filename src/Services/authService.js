@@ -29,6 +29,87 @@ const AuthService = {
       console.log(response);
       return handleResponse(response);
     } catch (error) {
+      return "error";
+    }
+  },
+  cashierLogin: async (name, password) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/auth/cashier/login`,
+        {
+          name,
+          password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+      return handleResponse(response);
+    } catch (error) {
+      return "error";
+    }
+  },
+  managerLogin: async (name, password, shopName, branch) => {
+    try {
+      console.log(name, password, shopName, branch);
+      const response = await axios.post(
+        `${BASE_URL}/auth/manager/login`,
+        {
+          username: name,
+          password,
+          shopName,
+          branchName: branch,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+      return handleResponse(response);
+    } catch (error) {
+      return "error";
+    }
+  },
+  getShopNames: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/auth/shops`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+  getBranches: async (shopName) => {
+    try {
+      console.log("shopName", shopName);
+      const response = await axios.get(
+        `${BASE_URL}/auth/branches/${shopName}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
       return { error: error.message };
     }
   },

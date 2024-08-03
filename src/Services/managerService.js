@@ -42,6 +42,34 @@ const managerService = {
       return { error: error.message };
     }
   },
+
+  getCashiers: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/manager/cashiers`, {
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+  addCashier: async (username, password) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/manager/cashier/add`,
+        {
+          username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return "error";
+    }
+  },
 };
 
 export default managerService;

@@ -29,7 +29,7 @@ const advantages = [
       "Get real-time updates on your business performance with our easy to use dashboard.",
   },
 ];
-const AdminLogin = () => {
+const CashierLogin = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -37,13 +37,8 @@ const AdminLogin = () => {
     e.preventDefault();
     console.log(name, password);
 
-    AuthService.adminLogin(name, password).then((res) => {
+    AuthService.cashierLogin(name, password).then((res) => {
       console.log(res);
-      if (res === "error") {
-        alert("Wrong Credentials");
-      } else {
-        window.location.href = "/admin/dashboard";
-      }
     });
   };
 
@@ -51,7 +46,7 @@ const AdminLogin = () => {
     <div className="text-center flex flex-col  items-center justify-center">
       <Navbar />
       <div className="m-10 p-10 pt-2 w-1/3">
-        <h1 className="text-2xl text-blue-500 mb-3">Admin Login</h1>
+        <h1 className="text-2xl text-blue-500 mb-3">Cashier Login</h1>
 
         <div className="flex flex-col justify-center gap-10">
           <div className="flex flex-col w-full">
@@ -86,9 +81,7 @@ const AdminLogin = () => {
           <a href="#" className="text-blue-500">
             Forgot Password?
           </a>
-          <a href="#" className="text-blue-500">
-            Create Account
-          </a>
+       
         </div>
       </div>
       <div className=" text-black bg-gray-100 shadow-lg flex flex-row items-center justify-center fixed bottom-0 w-full">
@@ -113,4 +106,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default CashierLogin;

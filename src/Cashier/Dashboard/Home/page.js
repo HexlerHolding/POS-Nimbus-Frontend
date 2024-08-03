@@ -6,194 +6,15 @@ import {
   updateQuantity,
   clearCart,
 } from "../Redux/Actions";
+import managerService from "../../../Services/managerService";
 import { BiPlus } from "react-icons/bi";
 import { BiMinus } from "react-icons/bi";
 import { BsCart } from "react-icons/bs";
 import { HiBadgeCheck } from "react-icons/hi";
 import { Modal } from "react-bootstrap";
 
-const productsData = [
-  {
-    id: 1,
-    product_name: "Product 1",
-    product_price: 100,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Electronics",
-  },
-  {
-    id: 2,
-    product_name: "Product 2",
-    product_price: 200,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Electronics",
-  },
-  {
-    id: 3,
-    product_name: "Product 3",
-    product_price: 300,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Electronics",
-  },
-  {
-    id: 4,
-    product_name: "Product 4",
-    product_price: 400,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Food",
-  },
-  {
-    id: 5,
-    product_name: "Product 5",
-    product_price: 500,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Food",
-  },
-  {
-    id: 6,
-    product_name: "Product 6",
-    product_price: 600,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Food",
-  },
-  {
-    id: 7,
-    product_name: "Product 7",
-    product_price: 700,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-  {
-    id: 8,
-    product_name: "Product 8",
-    product_price: 800,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-  {
-    id: 9,
-    product_name: "Product 9",
-    product_price: 900,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-  {
-    id: 10,
-    product_name: "Product 10",
-    product_price: 1000,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-  {
-    id: 11,
-    product_name: "Product 11",
-    product_price: 1100,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-  {
-    id: 12,
-    product_name: "Product 12",
-    product_price: 1200,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-  {
-    id: 13,
-    product_name: "Product 13",
-    product_price: 1300,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-  {
-    id: 14,
-    product_name: "Product 14",
-    product_price: 1400,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-  {
-    id: 15,
-    product_name: "Product 15",
-    product_price: 1500,
-    status: "active",
-    product_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-    category: "Clothes",
-  },
-];
-
-const activeOrders = [
-  {
-    id: 1,
-    timeDate: "2021-09-01T15:23:11Z",
-    products: [
-      {
-        id: 1,
-        product_name: "Product 1",
-        product_price: 100,
-        quantity: 1,
-      },
-      {
-        id: 2,
-        product_name: "Product 2",
-        product_price: 200,
-        quantity: 1,
-      },
-    ],
-    total: 300,
-    customerproduct_name: "John Doe",
-  },
-  {
-    id: 2,
-    timeDate: "2021-09-01T12:34:20Z",
-    products: [
-      {
-        id: 3,
-        product_name: "Product 3",
-        product_price: 300,
-        quantity: 1,
-      },
-      {
-        id: 4,
-        product_name: "Product 4",
-        product_price: 400,
-        quantity: 1,
-      },
-    ],
-    total: 700,
-    customerName: "Jane Doe",
-  },
-];
-
 const Home = () => {
+  const [activeOrders, setActiveOrders] = useState([]);
   const [details, setDetails] = useState({
     customerName: "",
     discount: 0,
@@ -202,18 +23,41 @@ const Home = () => {
     tax: 0,
     payment_method: "",
   });
+  const [products, setProducts] = useState([]);
+
+  const getProducts = () => {
+    managerService.getProducts().then((data) => {
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        console.log(data.data);
+        setProducts(data.data.products);
+      }
+    });
+  };
+
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [showDetailsForm, setShowDetailsForm] = useState(false);
   const [markedCompleted, setMarkedCompleted] = useState(false);
   const [markedDone, setMarkedDone] = useState(false);
   const [filter, setFilter] = useState("");
   const dispatch = useDispatch();
 
-  const [products, setProducts] = useState(productsData);
-
   useEffect(() => {
-    setProducts(
-      productsData.filter((product) =>
-        product.product_name.toLowerCase().includes(filter.toLowerCase())
+    managerService.getProducts().then((data) => {
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        console.log(data.data);
+        setProducts(data.data.products);
+        setFilteredProducts(data.data.products);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    setFilteredProducts(
+      products.filter((product) =>
+        product.name.toLowerCase().includes(filter.toLowerCase())
       )
     );
   }, [filter]);
@@ -229,7 +73,7 @@ const Home = () => {
   };
 
   const handleUpdateQuantity = (product, quantity) => {
-    dispatch(updateQuantity(product.id, quantity));
+    dispatch(updateQuantity(product._id, quantity));
     console.log("Product quantity updated", product, quantity);
   };
 
@@ -268,13 +112,13 @@ const Home = () => {
           onChange={(e) => setFilter(e.target.value)}
         />
         <div className="grid grid-cols-2 gap-4">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div
               key={product.id}
               className="border p-4 flex flex-col text-center rounded-lg"
             >
-              <h3 className="text-gray-700">{product.product_name}</h3>
-              <p>PKR {product.product_price}/-</p>
+              <h3 className="text-gray-700">{product.name}</h3>
+              <p>PKR {product.price}/-</p>
               <button
                 className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
                 onClick={() => handleAddToCart(product)}
@@ -305,11 +149,11 @@ const Home = () => {
 
           {cart.items.map((item) => (
             <div
-              key={item.id}
+              key={item._id}
               className="border p-4 flex items-center justify-between text-center rounded-lg h-20"
             >
-              <h3 className="text-gray-700">{item.product_name}</h3>
-              <p>PKR {item.product_price}/-</p>
+              <h3 className="text-gray-700">{item.name}</h3>
+              <p>PKR {item.price}/-</p>
               <p className="flex items-center justify-center">
                 <BiMinus
                   className="cursor-pointer mr-2"
@@ -357,8 +201,8 @@ const Home = () => {
                 <div className="flex flex-col">
                   {order.products.map((product) => (
                     <div key={product.id} className="flex justify-between">
-                      <p>{product.product_name}</p>
-                      <p>PKR {product.product_price}/-</p>
+                      <p>{product.name}</p>
+                      <p>PKR {product.price}/-</p>
                     </div>
                   ))}
                 </div>

@@ -2,44 +2,6 @@ import React, { useEffect, useState } from "react";
 import product from "../../../Assets/product.jpg";
 import ManagerService from "../../../Services/managerService";
 
-const data = [
-  {
-    product_name: "Product 1",
-    product_image: product,
-    product_description: "Product 1 Description",
-    category: "Category 1",
-    product_price: 100,
-  },
-  {
-    product_name: "Product 2",
-    product_image: product,
-    product_description: "Product 2 Description",
-    category: "Category 2",
-    product_price: 200,
-  },
-  {
-    product_name: "Product 3",
-    product_image: product,
-    product_description: "Product 3 Description",
-    category: "Category 3",
-    product_price: 300,
-  },
-  {
-    product_name: "Product 4",
-    product_image: product,
-    product_description: "Product 4 Description",
-    category: "Category 4",
-    product_price: 400,
-  },
-  {
-    product_name: "Product 5",
-    product_image: product,
-    product_description: "Product 5 Description",
-    category: "Category 5",
-    product_price: 500,
-  },
-];
-
 const ViewProducts = () => {
   const [products, setProducts] = useState([]);
 
@@ -70,7 +32,9 @@ const ViewProducts = () => {
             />
             <p className="text-white text-xl mb-10">{product.name}</p>
             <p className="text-gray-300 text-sm mb-3">{product.description}</p>
-            <p className="text-gray-300 text-sm mb-3">{product.category.category_name}</p>
+            <p className="text-gray-300 text-sm mb-3">
+              {product.category.category_name}
+            </p>
             <p className="text-gray-300 text-2xl mb-3">${product.price}</p>
           </div>
         </div>

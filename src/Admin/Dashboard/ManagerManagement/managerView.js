@@ -69,6 +69,9 @@ const ManagerView = () => {
             <th scope="col" class="px-6 py-3">
               Branch Name
             </th>
+            <th scope="col" class="px-6 py-3">
+              Username
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -90,6 +93,9 @@ const ManagerView = () => {
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                 {manager.branch_id.branch_name}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                {manager.username}
               </td>
             </tr>
           ))}
