@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { BiSolidSleepy } from "react-icons/bi";
-import data from "./data";
-const Orders = () => {
-  const [filteredOrders, setFilteredOrders] = useState(
-    data.filter((order) => order.order_status === "Pending")
-  );
+import CashierService from "../../Services/cashierService";
+import CommonService from "../../Services/common";
 
-  const [timeLeft, setTimeLeft] = useState(
-    filteredOrders.map(() => 180) // 3 minutes in seconds
-  );
+const Orders = () => {
+  const [filteredOrders, setFilteredOrders] = useState([]);
+
+  const [timeLeft, setTimeLeft] = useState([]);
+
+  const fetchOrders = async () => {
+    const response = await CashierService.getPendingOrders();
+    if (response.data) {
+      setFilteredOrders(response.data);
+      setTimeLeft(response.data.map(() => 180));
+    }
+  };
 
   useEffect(() => {
+    fetchOrders();
     const interval = setInterval(() => {
       setTimeLeft((prevTimeLeft) => prevTimeLeft.map((time) => time - 1));
     }, 1000);
@@ -31,10 +38,23 @@ const Orders = () => {
   };
 
   //const remove order from filteredOrders and timeLeft
-  const removeOrder = (index) => {
-    setFilteredOrders((prevFilteredOrders) =>
-      prevFilteredOrders.filter((_, i) => i !== index)
-    );
+  const removeOrder = (index, orderId) => {
+    try {
+      const res = CashierService.markOrderReady(orderId);
+      if (res.error) {
+        console.error(res.error);
+        return;
+      }
+      console.log(res.data);
+
+      setTimeLeft((prevTimeLeft) => prevTimeLeft.filter((_, i) => i !== index));
+
+      setFilteredOrders((prevFilteredOrders) =>
+        prevFilteredOrders.filter((_, i) => i !== index)
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const formatTime = (time) => {
@@ -63,12 +83,12 @@ const Orders = () => {
             key={index}
             className={`relative w-full rounded-lg items-center gap-5 h-96 justify-between card border-dashed border-2 border-gray-300 cursor-pointer 
               ${getBackgroundColor(timeLeft[index])}`}
-            onClick={() => removeOrder(index)}
+            onClick={() => removeOrder(index, order._id)}
           >
             <div>
               <div className="flex items-center justify-between p-5 pb-2">
                 <p className="text-2xl font-semibold">
-                  Order ID: {order.order_id}
+                  Order ID: {CommonService.handleID(order._id)}
                 </p>
                 <p className="text-md font-semibold">
                   Customer Name: {order.customer_name}

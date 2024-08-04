@@ -92,6 +92,7 @@ const DashboardLayout = () => {
                       <a
                         href="#"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        onClick={() => (window.location.href = "/admin/login")}
                       >
                         Sign out
                       </a>
@@ -278,6 +279,9 @@ const DashboardLayout = () => {
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                onClick={() => {
+                  window.location.href = "/admin/login";
+                }}
               >
                 <BiLogOut className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
                 <span className="flex-1 ms-3 whitespace-nowrap">Logout</span>

@@ -19,7 +19,7 @@ const CashierViews = () => {
 
   useEffect(() => {
     fetchCashiers();
-  }, [submitPressed]);
+  }, []);
 
   return (
     <div class="relative overflow-x-auto p-10 mt-10 min-h-screen">

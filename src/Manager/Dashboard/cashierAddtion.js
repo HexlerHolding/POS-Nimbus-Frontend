@@ -16,6 +16,8 @@ const CashierManagement = () => {
         alert("Cashier Added Successfully");
         setUsername("");
         setPassword("");
+        console.log(res);
+        
       }
     });
   };

@@ -6,12 +6,13 @@ import {
   updateQuantity,
   clearCart,
 } from "../Redux/Actions";
-import managerService from "../../../Services/managerService";
 import { BiPlus } from "react-icons/bi";
 import { BiMinus } from "react-icons/bi";
 import { BsCart } from "react-icons/bs";
 import { HiBadgeCheck } from "react-icons/hi";
 import { Modal } from "react-bootstrap";
+
+import CashierService from "../../../Services/cashierService";
 
 const Home = () => {
   const [activeOrders, setActiveOrders] = useState([]);
@@ -24,36 +25,65 @@ const Home = () => {
     payment_method: "",
   });
   const [products, setProducts] = useState([]);
-
-  const getProducts = () => {
-    managerService.getProducts().then((data) => {
-      if (data.error) {
-        console.log(data.error);
-      } else {
-        console.log(data.data);
-        setProducts(data.data.products);
-      }
-    });
-  };
-
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showDetailsForm, setShowDetailsForm] = useState(false);
   const [markedCompleted, setMarkedCompleted] = useState(false);
   const [markedDone, setMarkedDone] = useState(false);
   const [filter, setFilter] = useState("");
+  const [inBranch, setInBranch] = useState(false);
+  const [orderToComplete, setOrderToComplete] = useState("");
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    managerService.getProducts().then((data) => {
-      if (data.error) {
-        console.log(data.error);
+  const getProducts = async () => {
+    const response = await CashierService.getProducts();
+    if (response.error) {
+      console.log(response.error);
+    } else {
+      console.log(response.data);
+      setProducts(response.data);
+      setFilteredProducts(response.data);
+    }
+  };
+
+  const sortActiveOrders = (orders) => {
+    // sort based on ready first and then earliest within
+    orders.sort((a, b) => {
+      if (a.status === "pending" && b.status === "ready") {
+        return -1;
+      } else if (a.status === "ready" && b.status === "pending") {
+        return 1;
       } else {
-        console.log(data.data);
-        setProducts(data.data.products);
-        setFilteredProducts(data.data.products);
+        return a.time - b.time;
       }
     });
+
+    setActiveOrders(orders);
+  };
+
+  const getActiveOrders = async () => {
+    const response = await CashierService.getActiveOrders();
+    if (response.error) {
+      console.log(response.error);
+    } else {
+      console.log(response.data);
+      sortActiveOrders(response.data);
+    }
+  };
+
+  useEffect(() => {
+    if (inBranch) {
+      setDetails({ ...details, address: "In Branch" });
+    } else {
+      setDetails({ ...details, address: "" });
+    }
+  }, [inBranch]);
+
+  useEffect(() => {
+    getProducts();
+    getActiveOrders();
+    setFilter("");
   }, []);
+
   useEffect(() => {
     setFilteredProducts(
       products.filter((product) =>
@@ -77,30 +107,74 @@ const Home = () => {
     console.log("Product quantity updated", product, quantity);
   };
 
+  const handleCheckout = async () => {
+    const order = {
+      products: cart.items,
+      total: cart.total,
+      customer_name: details.customerName,
+      payment_method: details.payment_method,
+      order_type: details.order_type,
+      tax: details.tax,
+      discount: details.discount,
+      address: details.address,
+    };
+    const response = await CashierService.addOrder(order);
+    if (response.error) {
+      console.log(response.error);
+    } else {
+      console.log(response.data);
+      setShowDetailsForm(false);
+      console.log(response.data);
+      setActiveOrders([...activeOrders, response.data.order]);
+      dispatch(clearCart());
+    }
+  };
+
   useEffect(() => {
-    setFilter("");
-  }, []);
+    console.log(filteredProducts);
+  }, [filteredProducts]);
+
+  useEffect(() => {
+    console.log(products);
+  }, [products]);
 
   const cart = useSelector((state) => state.cart);
 
-  const [inBranch, setInBranch] = useState(true);
-
   const [order_types, setOrderTypes] = useState([
-    "Delivery",
-    "Takeaway",
-    "Dine-in",
+    "delivery",
+    "takeaway",
+    "dine-in",
   ]);
 
-  const [payment_methods, setPaymentMethods] = useState([
-    "Cash",
-    "Credit Card",
-  ]);
+  const [payment_methods, setPaymentMethods] = useState(["cash", "card"]);
 
   //console log the cart
 
   useEffect(() => {
     console.log(cart);
   }, [cart]);
+
+  const handleCompleteOrder = async () => {
+    try {
+      console.log(orderToComplete);
+      const res = await CashierService.markOrderCompleted(orderToComplete);
+      if (res.error) {
+        console.log(res.error);
+        return;
+      } else {
+        console.log(res.data);
+      }
+      setActiveOrders(
+        activeOrders.filter((order) => order._id !== orderToComplete)
+      );
+      setMarkedCompleted(false);
+      setMarkedDone(true);
+      setOrderToComplete("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="home flex">
       <div className="p-20 bg-white w-2/3">
@@ -114,7 +188,7 @@ const Home = () => {
         <div className="grid grid-cols-2 gap-4">
           {filteredProducts.map((product) => (
             <div
-              key={product.id}
+              key={product._id}
               className="border p-4 flex flex-col text-center rounded-lg"
             >
               <h3 className="text-gray-700">{product.name}</h3>
@@ -129,7 +203,7 @@ const Home = () => {
           ))}
         </div>
       </div>
-      <div className="p-20 bg-white w-1/3 cart fixed right-0 top-0 h-full border-l">
+      <div className="p-20 bg-white w-1/3 cart fixed right-0 top-0 h-screen border-l overflow-y-auto">
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-xl text-blue-500 mb-3">Cart</h1>
           <button
@@ -171,7 +245,7 @@ const Home = () => {
         <div className="border-t p-4 flex justify-between items-center">
           <p className="text-gray-700">Total: PKR {cart.total}/-</p>
           <button
-            className="bg-green-500 text-white p-2 rounded hover:bg-red-600"
+            className="bg-green-500 text-white p-2 rounded hover:bg-green-700"
             onClick={() => setShowDetailsForm(true)}
           >
             Checkout
@@ -181,42 +255,53 @@ const Home = () => {
           <div className="flex justify-between">
             <h3 className="text-xl text-blue-500">Active Orders</h3>
             <h3 className="">
-              {activeOrders.length}{" "}
-              <span className="text-blue-700">Active Orders</span>
+              {activeOrders ? activeOrders.length : 0}{" "}
+              <span className="text-blue-700">Order(s)</span>
             </h3>
           </div>
           <div className="overflow-y-auto h-72 no-scrollbar flex flex-col justify-between">
-            {activeOrders.map((order) => (
-              <div
-                key={order.id}
-                className="border-2 border-dashed p-4 flex flex-col text-center rounded-lg mt-10 me-4"
-              >
-                <p className="text-gray-700 flex justify-between">
-                  Customer{" "}
-                  <span className="text-blue-600">{order.customerName}</span>
-                </p>
-                <p className="text-gray-700 text-left text-sm mt-2 mb-2">
-                  Time: {new Date(order.timeDate).toLocaleString()}
-                </p>
-                <div className="flex flex-col">
-                  {order.products.map((product) => (
-                    <div key={product.id} className="flex justify-between">
-                      <p>{product.name}</p>
-                      <p>PKR {product.price}/-</p>
-                    </div>
-                  ))}
+            {activeOrders &&
+              activeOrders.map((order) => (
+                <div
+                  key={order._id}
+                  className="relative border-2 border-dashed p-4 flex flex-col text-center rounded-lg mt-10 me-4"
+                >
+                  <div
+                    className={`absolute top-2 right-2 w-4 h-4 rounded-full ${
+                      order.status === "pending"
+                        ? "bg-yellow-300"
+                        : "bg-green-500"
+                    }`}
+                  ></div>
+                  <p className=" flex flex-row text-gray-700 flex justify-left gap-1">
+                    <p>Customer name:</p>
+                    <span className="text-blue-600">{order.customer_name}</span>
+                  </p>
+                  <p className="text-gray-700 text-left text-sm mt-2 mb-2">
+                    Time: {new Date(order.time).toLocaleString()}
+                  </p>
+                  <div className="flex flex-col">
+                    {order.cart.map((orderItem) => (
+                      <div key={orderItem._id} className="flex justify-between">
+                        <p>{orderItem.product_name}</p>
+                        <p>PKR {orderItem.price}/-</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between items-center mt-3">
+                    <p>Total: PKR {order.total}/-</p>
+                    <button
+                      className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm"
+                      onClick={() => {
+                        setOrderToComplete(order._id);
+                        setMarkedCompleted(true);
+                      }}
+                    >
+                      Mark Completed
+                    </button>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center mt-3">
-                  <p>Total: PKR {order.total}/-</p>
-                  <button
-                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm"
-                    onClick={() => setMarkedCompleted(true)}
-                  >
-                    Mark Completed
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>
@@ -294,7 +379,10 @@ const Home = () => {
                   disabled={inBranch}
                   value={details.address}
                   onChange={(e) =>
-                    setDetails({ ...details, address: e.target.value })
+                    setDetails({
+                      ...details,
+                      address: e.target.value,
+                    })
                   }
                 />
               </div>
@@ -391,11 +479,7 @@ const Home = () => {
           <button
             type="submit"
             className="bg-green-500 text-white p-2 rounded hover:bg-green-600 w-1/2"
-            onClick={(e) => {
-              e.preventDefault();
-              console.log(details);
-              setShowDetailsForm(false);
-            }}
+            onClick={handleCheckout}
           >
             Checkout
           </button>
@@ -417,22 +501,17 @@ const Home = () => {
         </Modal.Body>
         <Modal.Footer className="flex justify-between mt-5 border-t pt-3 gap-5">
           <button
+            type="submit"
+            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 w-1/2"
+            onClick={handleCompleteOrder}
+          >
+            Yes
+          </button>
+          <button
             className="bg-red-500 text-white p-2 rounded hover:bg-red-600 w-1/2"
             onClick={() => setMarkedCompleted(false)}
           >
             No
-          </button>
-          <button
-            type="submit"
-            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 w-1/2"
-            onClick={(e) => {
-              e.preventDefault();
-              console.log("Order marked as completed");
-              setMarkedCompleted(false);
-              setMarkedDone(true);
-            }}
-          >
-            Yes
           </button>
         </Modal.Footer>
       </Modal>

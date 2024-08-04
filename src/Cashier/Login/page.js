@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BiWorld } from "react-icons/bi";
 import { FaChartLine } from "react-icons/fa";
 import { AiOutlineClockCircle } from "react-icons/ai";
@@ -32,13 +32,47 @@ const advantages = [
 const CashierLogin = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [branches, setBranches] = useState([]);
+  const [branch, setBranch] = useState("");
+  const [shopNames, setShopNames] = useState([]);
+  const [shopName, setShopName] = useState("");
+
+  useEffect(() => {
+    AuthService.getShopNames().then((res) => {
+      setShopNames(res);
+      console.log("ShopNames", shopNames);
+    });
+  }, []);
+
+  const getBranches = () => {
+    AuthService.getBranches(shopName).then((res) => {
+      console.log("ShopName", shopName);
+      console.log(res);
+      setBranches(res);
+    });
+  };
+
+  useEffect(() => {
+    if (shopName === "") {
+      setBranches([]);
+    }
+    if (shopName) {
+      getBranches();
+    }
+  }, [shopName]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(name, password);
+    console.log(name, password, shopName, branch);
 
-    AuthService.cashierLogin(name, password).then((res) => {
+    AuthService.cashierLogin(name, password, shopName, branch).then((res) => {
       console.log(res);
+      if (res === "error") {
+        alert("Wrong Credentials");
+      } else {
+        alert("Login Successful");
+        window.location.href = "/cashier/dashboard";
+      }
     });
   };
 
@@ -49,25 +83,57 @@ const CashierLogin = () => {
         <h1 className="text-2xl text-blue-500 mb-3">Cashier Login</h1>
 
         <div className="flex flex-col justify-center gap-10">
-          <div className="flex flex-col w-full">
-            <h1 className="text-left text-black text-md">Username</h1>
-            <input
-              type="text"
-              placeholder="Name"
-              value={name}
-              className="p-2 border border-gray-300 rounded-xl"
-              onChange={(e) => setName(e.target.value)}
-            />
+          <div className="flex flex-row w-full gap-4">
+            <div className="flex flex-col w-1/2">
+              <h1 className="text-left text-black text-md">Username</h1>
+              <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                className="p-2 border border-gray-300 rounded-xl"
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col w-1/2">
+              <h1 className="text-left text-black text-md">Password</h1>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                className="p-2 border border-gray-300 rounded-xl"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
           </div>
+        </div>
+        <div className="flex flex-col justify-center mt-3">
           <div className="flex flex-col w-full">
-            <h1 className="text-left text-black text-md">Password</h1>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
+            <h1 className="text-left text-black text-md">Shop Name</h1>
+            <select
               className="p-2 border border-gray-300 rounded-xl"
-              onChange={(e) => setPassword(e.target.value)}
-            />
+              onChange={(e) => setShopName(e.target.value)}
+            >
+              <option value="">Select Shop</option>
+              {shopNames &&
+                shopNames.map((shop) => (
+                  <option value={shop.shop_name}>{shop.shop_name}</option>
+                ))}
+            </select>
+          </div>
+          <div className="flex flex-col w-full mt-4">
+            <h1 className="text-left text-black text-md">Branch</h1>
+            <select
+              className="p-2 border border-gray-300 rounded-xl"
+              onChange={(e) => setBranch(e.target.value)}
+            >
+              <option value="">Select Branch</option>
+              {branches &&
+                branches.map((branch) => (
+                  <option value={branch.branch_name}>
+                    {branch.branch_name}
+                  </option>
+                ))}
+            </select>
           </div>
         </div>
         <button
@@ -81,7 +147,6 @@ const CashierLogin = () => {
           <a href="#" className="text-blue-500">
             Forgot Password?
           </a>
-       
         </div>
       </div>
       <div className=" text-black bg-gray-100 shadow-lg flex flex-row items-center justify-center fixed bottom-0 w-full">

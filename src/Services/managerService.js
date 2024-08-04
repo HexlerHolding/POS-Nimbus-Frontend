@@ -43,6 +43,20 @@ const managerService = {
     }
   },
 
+  getCategories: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/manager/categories`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
   getCashiers: async () => {
     try {
       const response = await axios.get(`${BASE_URL}/manager/cashiers`, {
@@ -53,6 +67,7 @@ const managerService = {
       return { error: error.message };
     }
   },
+
   addCashier: async (username, password) => {
     try {
       const response = await axios.post(

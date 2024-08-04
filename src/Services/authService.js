@@ -32,13 +32,16 @@ const AuthService = {
       return "error";
     }
   },
-  cashierLogin: async (name, password) => {
+  cashierLogin: async (name, password, shopName, branch) => {
     try {
+      // console.log(name, password, shopName, branch);
       const response = await axios.post(
         `${BASE_URL}/auth/cashier/login`,
         {
-          name,
+          username: name,
           password,
+          shopName,
+          branchName: branch,
         },
         {
           headers: {
