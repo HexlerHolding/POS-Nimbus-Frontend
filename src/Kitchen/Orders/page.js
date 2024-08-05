@@ -12,7 +12,11 @@ const Orders = () => {
     const response = await CashierService.getPendingOrders();
     if (response.data) {
       setFilteredOrders(response.data);
-      setTimeLeft(response.data.map(() => 180));
+      const TimeNow = new Date().getTime();
+      setTimeLeft(response.data.map((order) => {
+        const orderTime = new Date(order.time).getTime();
+        return Math.floor((orderTime + 180000 - TimeNow) / 1000);
+      }));
     }
   };
 
@@ -21,6 +25,15 @@ const Orders = () => {
     const interval = setInterval(() => {
       setTimeLeft((prevTimeLeft) => prevTimeLeft.map((time) => time - 1));
     }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  //call fetchOrders every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);

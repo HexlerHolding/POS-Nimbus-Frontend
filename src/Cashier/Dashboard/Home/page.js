@@ -127,6 +127,15 @@ const Home = () => {
       console.log(response.data);
       setActiveOrders([...activeOrders, response.data.order]);
       dispatch(clearCart());
+      //clear details
+      setDetails({
+        customerName: "",
+        discount: 0,
+        address: "",
+        order_type: "",
+        tax: 0,
+        payment_method: "",
+      });
     }
   };
 
@@ -289,7 +298,7 @@ const Home = () => {
                     ))}
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <p>Total: PKR {order.total}/-</p>
+                    <p>Total: PKR {(order.total + order.tax).toFixed(2)}/-</p>
                     <button
                       className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm"
                       onClick={() => {
