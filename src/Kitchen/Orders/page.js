@@ -13,10 +13,12 @@ const Orders = () => {
     if (response.data) {
       setFilteredOrders(response.data);
       const TimeNow = new Date().getTime();
-      setTimeLeft(response.data.map((order) => {
-        const orderTime = new Date(order.time).getTime();
-        return Math.floor((orderTime + 180000 - TimeNow) / 1000);
-      }));
+      setTimeLeft(
+        response.data.map((order) => {
+          const orderTime = new Date(order.time).getTime();
+          return Math.floor((orderTime + 180000 - TimeNow) / 1000);
+        })
+      );
     }
   };
 
@@ -118,9 +120,11 @@ const Orders = () => {
                   </p>
                 </div>
               ))}
+
               <div className="absolute bottom-0 justify-between border-t-2 flex items-center p-2 w-full">
                 <p className="text-xl p-2 font-light">
-                  Grand Total: {(order.total + order.tax).toFixed(2)} /-
+                  Grand Total:{" "}
+                  {(order.total + (order.total * 5) / 100).toFixed(2)}
                 </p>
                 <p
                   className={`text-2xl p-2 font-semibold ${getBackgroundColor(

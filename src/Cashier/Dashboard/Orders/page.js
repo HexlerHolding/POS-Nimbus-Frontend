@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { BiSolidSleepy } from "react-icons/bi";
-import data from "./data";
+import cashierService from "../../../Services/cashierService";
+import commonService from "../../../Services/common";
 const Orders = () => {
+  const [data, setData] = useState([]);
   const [activeOption, setActiveOption] = useState("All Orders");
   const [filteredOrders, setFilteredOrders] = useState(data);
 
@@ -10,7 +12,19 @@ const Orders = () => {
   const [time, setTime] = useState("");
   const [total, setTotal] = useState("");
   const [payment_method, setPayment_method] = useState("");
-  const [order_status, setOrder_status] = useState("");
+  const [status, setstatus] = useState("");
+
+  const getOrders = async () => {
+    const response = await cashierService.getOrders();
+    if (response.data) {
+      setData(response.data);
+      setFilteredOrders(response.data);
+    }
+  };
+
+  useEffect(() => {
+    getOrders();
+  }, []);
 
   const [paymentMethods, setPaymentMethods] = useState([
     "Cash",
@@ -30,13 +44,11 @@ const Orders = () => {
     if (activeOption === "All Orders") {
       setFilteredOrders(data);
     } else if (activeOption === "Pending Orders") {
-      setFilteredOrders(
-        data.filter((order) => order.order_status === "Pending")
-      );
+      setFilteredOrders(data.filter((order) => order.status === "pending"));
     } else if (activeOption === "Completed Orders") {
-      setFilteredOrders(
-        data.filter((order) => order.order_status === "Delivered")
-      );
+      setFilteredOrders(data.filter((order) => order.status === "completed"));
+    } else if (activeOption === "Ready Orders") {
+      setFilteredOrders(data.filter((order) => order.status === "ready"));
     }
   }, [activeOption]);
 
@@ -63,10 +75,8 @@ const Orders = () => {
         (order) => order.payment_method === payment_method
       );
     }
-    if (order_status) {
-      filteredData = filteredData.filter(
-        (order) => order.order_status === order_status
-      );
+    if (status) {
+      filteredData = filteredData.filter((order) => order.status === status);
     }
     setFilteredOrders(filteredData);
     console.log(filteredData);
@@ -78,7 +88,7 @@ const Orders = () => {
     setTime("");
     setTotal("");
     setPayment_method("");
-    setOrder_status("");
+    setstatus("");
     setActiveOption("All Orders");
     setFilteredOrders(data);
   };
@@ -179,10 +189,10 @@ const Orders = () => {
             </div>
             <div className="relative z-0 mb-5 group w-1/3">
               <select
-                name="order_status"
-                id="order_status"
+                name="status"
+                id="status"
                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                onChange={(e) => setOrder_status(e.target.value)}
+                onChange={(e) => setstatus(e.target.value)}
               >
                 <option value="">Select Order Status</option>
                 {orderStatus.map((status, index) => (
@@ -192,7 +202,7 @@ const Orders = () => {
                 ))}
               </select>
               <label
-                for="order_status"
+                for="status"
                 className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
               >
                 Order Status
@@ -241,6 +251,14 @@ const Orders = () => {
           >
             Completed Orders
           </button>
+          <button
+            className={`${
+              activeOption === "Ready Orders" ? "bg-green-500" : "bg-gray-800"
+            } text-white px-5 py-2 rounded-lg`}
+            onClick={() => setActiveOption("Ready Orders")}
+          >
+            Ready Orders
+          </button>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 p-5">
@@ -257,17 +275,19 @@ const Orders = () => {
           >
             <div>
               <div className="flex items-center justify-between">
-                <p className="text-xl mb-10">Order ID: {order.order_id}</p>
+                <p className="text-xl mb-10">
+                  Order ID: {commonService.handleCode(order._id)}
+                </p>
                 <p
                   className={`text-md mb-10 border-2 px-2 rounded-full ${
-                    order.order_status === "Pending"
+                    order.status === "pending"
                       ? "bg-yellow-200 text-yellow-700"
-                      : order.order_status === "Delivered"
+                      : order.status === "completed"
                       ? "bg-green-200 text-green-800"
                       : "bg-red-200 text-red-800"
                   }`}
                 >
-                  {order.order_status}
+                  {order.status}
                 </p>
               </div>
               <p className="text-md mb-10">
@@ -289,7 +309,7 @@ const Orders = () => {
                 <p className="text-md p-2">
                   Grand Total: {(order.total + order.tax).toFixed(2)} /-
                 </p>
-                {order.order_status === "Pending" && (
+                {order.status === "Pending" && (
                   <button className="text-blue-500 underline rounded-lg ml-auto">
                     Cancel Order
                   </button>

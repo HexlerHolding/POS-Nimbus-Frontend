@@ -70,6 +70,16 @@ const Home = () => {
     }
   };
 
+  //get active orders every 5 seconds
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getActiveOrders();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (inBranch) {
       setDetails({ ...details, address: "In Branch" });
@@ -282,7 +292,7 @@ const Home = () => {
                         : "bg-green-500"
                     }`}
                   ></div>
-                  <p className=" flex flex-row text-gray-700 flex justify-left gap-1">
+                  <p className=" flex flex-row text-gray-700 justify-left gap-1">
                     <p>Customer name:</p>
                     <span className="text-blue-600">{order.customer_name}</span>
                   </p>
@@ -298,7 +308,12 @@ const Home = () => {
                     ))}
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <p>Total: PKR {(order.total + order.tax).toFixed(2)}/-</p>
+                    <p>
+                      Total: PKR{" "}
+                      {order.payment_method === "card"
+                        ? (order.total + (order.total * 5) / 100).toFixed(2)
+                        : (order.total + (order.total * 16) / 100).toFixed(2)}
+                    </p>
                     <button
                       className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm"
                       onClick={() => {
