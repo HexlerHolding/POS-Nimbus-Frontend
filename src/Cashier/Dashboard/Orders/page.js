@@ -7,6 +7,23 @@ const Orders = () => {
   const [activeOption, setActiveOption] = useState("All Orders");
   const [filteredOrders, setFilteredOrders] = useState(data);
 
+  const [card_tax, setCard_tax] = useState(0);
+  const [cash_tax, setCash_tax] = useState(0);
+
+  useEffect(() => {
+    try {
+      //get taxes for card and cash from backend
+      cashierService.getTaxes().then((response) => {
+        if (response.data) {
+          setCard_tax(response.data.card_tax);
+          setCash_tax(response.data.cash_tax);
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }, []);
+
   const [order_id, setOrder_id] = useState("");
   const [customer_name, setCustomer_name] = useState("");
   const [time, setTime] = useState("");
@@ -303,7 +320,7 @@ const Orders = () => {
                 <div>
                   <p className="text-md">Total Amount: {order.total} /-</p>
                 </div>
-                <p className="text-md ml-auto">Tax: {order.tax} /-</p>
+                <p className="text-md ml-auto">Tax: {order.tax} %</p>
               </div>
               <div className="w-full border-t-2 flex items-center p-2">
                 <p className="text-md p-2">

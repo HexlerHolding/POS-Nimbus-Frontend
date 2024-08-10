@@ -1,10 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
-import orders from "./data.js";
+
 import ApexCharts from "apexcharts";
 import { BiDownload } from "react-icons/bi";
+import AdminService from "../../../Services/adminService.js";
+import commonService from "../../../Services/common.js";
 
 const Order = () => {
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    AdminService.getAllOrders().then((response) => {
+      if (response.error) {
+        console.log(response.error);
+
+        return;
+      }
+      setOrders(response.data);
+    });
+  }, []);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
@@ -37,15 +52,14 @@ const Order = () => {
     0
   );
 
-  const averageOrder = totalSales / totalOrders;
+  const averageOrder = (totalSales / totalOrders).toFixed(2);
 
   const highestOrder = orders.reduce((acc, order) => {
     return Math.max(acc, order.total);
   }, 0);
 
   const numberOfRefunds = orders.filter((order) => {
-    //count the orders where order_status is refunded
-    return order.order_status === "Refunded";
+    return order.status === "cancelled";
   }).length;
 
   const totalTax = orders.reduce((acc, order) => {
@@ -147,14 +161,16 @@ const Order = () => {
   //create data for delivery vs pickup chart
   const deliveryVsPickup = orders.reduce(
     (acc, order) => {
-      if (order.order_type === "Delivery") {
+      if (order.order_type === "delivery") {
         acc.delivery += 1;
-      } else if (order.order_type === "Pickup") {
-        acc.pickup += 1;
+      } else if (order.order_type === "takeaway") {
+        acc.takeway += 1;
+      } else if (order.order_type === "dine-in") {
+        acc.dine += 1;
       }
       return acc;
     },
-    { delivery: 0, pickup: 0 }
+    { delivery: 0, takeway: 0, dine: 0 }
   );
 
   //now create a pie chart for delivery vs pickup
@@ -171,9 +187,13 @@ const Order = () => {
       dataLabels: {
         enabled: false,
       },
-      series: [deliveryVsPickup.delivery, deliveryVsPickup.pickup],
-      labels: ["Delivery", "Pickup"],
-      colors: ["#1A56DB", "#F87171"],
+      series: [
+        deliveryVsPickup.delivery,
+        deliveryVsPickup.takeway,
+        deliveryVsPickup.dine,
+      ],
+      labels: ["Delivery", "Takeaway", "Dine-in"],
+      colors: ["#1A56DB", "#F87171", "#34D399"],
       //change label colors
 
       legend: {
@@ -225,10 +245,8 @@ const Order = () => {
     //get orders for last 7 days only than 2021-09-01T12:00:00Z
     const last7Days = orders.filter((order) => {
       return (
-        new Date(order.time) >
-          new Date(
-            new Date("2021-09-01T12:00:00Z") - 7 * 24 * 60 * 60 * 1000
-          ) && new Date(order.time) < new Date("2021-09-08T12:00:00Z")
+        new Date(order.time) > new Date(new Date() - 7 * 24 * 60 * 60 * 1000) &&
+        new Date(order.time) < new Date()
       );
     });
 
@@ -239,21 +257,22 @@ const Order = () => {
     const seriesData = {
       Cash: new Array(categories.length).fill(0),
       Card: new Array(categories.length).fill(0),
-      PayPal: new Array(categories.length).fill(0),
     };
+
+    console.log("Categories", categories);
 
     last7Days.forEach((order) => {
       const date = order.time.split("T")[0];
       const index = categories.indexOf(date);
 
-      if (order.payment_method === "Cash") {
+      if (order.payment_method === "cash") {
         seriesData.Cash[index] += order.total;
-      } else if (order.payment_method === "Credit Card") {
+      } else if (order.payment_method === "card") {
         seriesData.Card[index] += order.total;
-      } else if (order.payment_method === "PayPal") {
-        seriesData.PayPal[index] += order.total;
       }
     });
+
+    console.log("Series Data", seriesData);
 
     const options = {
       chart: {
@@ -277,16 +296,12 @@ const Order = () => {
       colors: ["#1A56DB", "#F87171", "#34D399"],
       series: [
         {
-          name: "Cash",
+          name: "cash",
           data: seriesData.Cash,
         },
         {
-          name: "Card",
+          name: "card",
           data: seriesData.Card,
-        },
-        {
-          name: "PayPal",
-          data: seriesData.PayPal,
         },
       ],
       xaxis: {
@@ -407,7 +422,7 @@ const Order = () => {
 
   const onClickDownloadOrdersData = () => {
     const csv = orders.map((order) => {
-      return `${order.order_id},${order.customer_name},${order.address},${order.total},${order.order_status},${order.payment_method},${order.order_type},${order.time},${order.tax}`;
+      return `${order._id},${order.customer_name},${order.address},${order.total},${order.status},${order.payment_method},${order.order_type}`;
     });
 
     const csvData = csv.join("\n");
@@ -442,7 +457,9 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Total Sales</p>
-            <p className="text-3xl text-black font-semibold">${totalSales}</p>
+            <p className="text-3xl text-black font-semibold">
+              {totalSales.toFixed(2)}
+            </p>
           </div>
         </div>
         <div
@@ -453,7 +470,9 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Sales Today</p>
-            <p className="text-3xl text-black font-semibold">${salesToday}</p>
+            <p className="text-3xl text-black font-semibold">
+              {salesToday.toFixed(2)}
+            </p>
           </div>
         </div>
         <div
@@ -465,7 +484,7 @@ const Order = () => {
           <div>
             <p className="text-black text-md mb-0">Sales Last 30 Days</p>
             <p className="text-3xl text-black font-semibold">
-              ${salesLast30Days}
+              {salesLast30Days.toFixed(2)}
             </p>
           </div>
         </div>
@@ -479,7 +498,7 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Average Order</p>
-            <p className="text-3xl text-black font-semibold">${averageOrder}</p>
+            <p className="text-3xl text-black font-semibold">{averageOrder}</p>
           </div>
         </div>
         <div
@@ -490,7 +509,9 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Highest Order</p>
-            <p className="text-3xl text-black font-semibold">${highestOrder}</p>
+            <p className="text-3xl text-black font-semibold">
+              {highestOrder.toFixed(2)}
+            </p>
           </div>
         </div>
         <div
@@ -514,7 +535,9 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Total Tax Collected</p>
-            <p className="text-3xl text-black font-semibold">${totalTax}</p>
+            <p className="text-3xl text-black font-semibold">
+              {totalTax.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -571,7 +594,7 @@ const Order = () => {
               >
                 <td class="px-6 py-4">
                   <div class="flex items-center space-x-3">
-                    <p>{order.order_id}</p>
+                    <p>{commonService.handleCode(order._id)}</p>
                   </div>
                 </td>
                 <td class="px-6 py-4">
@@ -584,7 +607,7 @@ const Order = () => {
                   <p>{order.total}</p>
                 </td>
                 <td class="px-6 py-4">
-                  <p>{order.order_status}</p>
+                  <p>{order.status}</p>
                 </td>
                 <td class="px-6 py-4">
                   <p>{order.payment_method}</p>
@@ -648,7 +671,7 @@ const Order = () => {
               <strong>Order Type:</strong> {selectedOrder?.order_type}
             </p>
             <p>
-              <strong>Order Status:</strong> {selectedOrder?.order_status}
+              <strong>Order Status:</strong> {selectedOrder?.status}
             </p>
           </div>
           <div className="flex items-center justify-between mb-2 mt-2">

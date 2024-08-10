@@ -101,6 +101,28 @@ const cashierService = {
       return { error: error.message };
     }
   },
+
+  getTaxes: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/cashier/taxes`, {
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  getBranchStatus: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/cashier/branch/status`, {
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
 };
 
 export default cashierService;

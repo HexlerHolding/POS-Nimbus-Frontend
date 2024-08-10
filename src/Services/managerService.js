@@ -85,6 +85,93 @@ const managerService = {
       return "error";
     }
   },
+
+  getBranch: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/manager/`, {
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  updateBranchTimings: async (branch) => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/manager/branch/timings`,
+        {
+          branchGot: branch,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  openBranch: async (branch) => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/manager/branch/openBranch`,
+        {
+          branch,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response);
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  closeBranch: async (branch) => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/manager/branch/closeBranch`,
+        { branch },
+        {
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  updateCashOnHand: async (cash_on_hand) => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/manager/branch/updateCashOnHand`,
+        { cash_on_hand },
+        {
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  getBranchOrders: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/manager/branch/orders`, {
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return "error";
+    }
+  },
 };
 
 export default managerService;

@@ -15,6 +15,7 @@ import { Modal } from "react-bootstrap";
 import CashierService from "../../../Services/cashierService";
 
 const Home = () => {
+  const [branchStatus, setBranchStatus] = useState(true);
   const [activeOrders, setActiveOrders] = useState([]);
   const [details, setDetails] = useState({
     customerName: "",
@@ -24,14 +25,17 @@ const Home = () => {
     tax: 0,
     payment_method: "",
   });
+
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showDetailsForm, setShowDetailsForm] = useState(false);
   const [markedCompleted, setMarkedCompleted] = useState(false);
   const [markedDone, setMarkedDone] = useState(false);
   const [filter, setFilter] = useState("");
-  const [inBranch, setInBranch] = useState(false);
+  const [inBranch, setInBranch] = useState(true);
   const [orderToComplete, setOrderToComplete] = useState("");
+
+  const [showBranchIsClosed, setShowBranchIsClosed] = useState(false);
   const dispatch = useDispatch();
 
   const getProducts = async () => {
@@ -69,6 +73,29 @@ const Home = () => {
       sortActiveOrders(response.data);
     }
   };
+
+  const getBranchStatus = async () => {
+    const response = await CashierService.getBranchStatus();
+    if (response.error) {
+      console.log(response.error);
+    } else {
+      console.log(response.data);
+      if (!response.data.status) {
+        setShowBranchIsClosed(true);
+      } else {
+        setShowBranchIsClosed(false);
+      }
+    }
+  };
+
+  //get branch status every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getBranchStatus();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   //get active orders every 5 seconds
 
@@ -146,6 +173,8 @@ const Home = () => {
         tax: 0,
         payment_method: "",
       });
+
+      setInBranch(true);
     }
   };
 
@@ -193,6 +222,23 @@ const Home = () => {
       console.log(error);
     }
   };
+
+  const [card_tax, setCard_tax] = useState(0);
+  const [cash_tax, setCash_tax] = useState(0);
+
+  useEffect(() => {
+    try {
+      //get taxes for card and cash from backend
+      CashierService.getTaxes().then((response) => {
+        if (response.data) {
+          setCard_tax(response.data.card_tax);
+          setCash_tax(response.data.cash_tax);
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }, []);
 
   return (
     <div className="home flex">
@@ -311,8 +357,14 @@ const Home = () => {
                     <p>
                       Total: PKR{" "}
                       {order.payment_method === "card"
-                        ? (order.total + (order.total * 5) / 100).toFixed(2)
-                        : (order.total + (order.total * 16) / 100).toFixed(2)}
+                        ? (
+                            order.total +
+                            (order.total * card_tax) / 100
+                          ).toFixed(2)
+                        : (
+                            order.total +
+                            (order.total * cash_tax) / 100
+                          ).toFixed(2)}
                     </p>
                     <button
                       className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm"
@@ -351,6 +403,11 @@ const Home = () => {
         ></div>
       )}
 
+      {showBranchIsClosed && (
+        //overlay
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-40"></div>
+      )}
+
       <Modal
         show={showDetailsForm}
         onHide={() => setShowDetailsForm(false)}
@@ -367,6 +424,7 @@ const Home = () => {
               onChange={(e) => setInBranch(e.target.checked)}
               className="form-check-input"
               id="inBranch"
+              value={inBranch}
             />
             <label htmlFor="inBranch" className="form-check-label mb-1 ml-2">
               In Branch
@@ -562,6 +620,22 @@ const Home = () => {
             Close
           </button>
         </Modal.Footer>
+      </Modal>
+      <Modal
+        show={showBranchIsClosed}
+        onHide={() => setShowBranchIsClosed(false)}
+        centered
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-1/3 shadow-xl z-50 bg-white p-5 modal modalbody"
+      >
+        <Modal.Header className="flex justify-between mb-5">
+          <Modal.Title className="text-xl text-blue-500">
+            Branch Closed
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="flex flex-col items-center justify-center gap-5">
+          <HiBadgeCheck className="text-8xl text-blue-500" />
+          <p>Branch is currently closed</p>
+        </Modal.Body>
       </Modal>
     </div>
   );

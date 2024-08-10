@@ -89,6 +89,62 @@ const AdminService = {
       return "error";
     }
   },
+
+  getAllOrders: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/admin/orders`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  getAllProducts: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/admin/products`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  getNumberOfBranches: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/admin/branches/count`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  getBranchSales: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/admin/branches/sales`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
 };
 
 export default AdminService;

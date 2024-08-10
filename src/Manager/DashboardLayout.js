@@ -4,12 +4,14 @@ import pfp2 from "../Assets/pfp2.jpeg";
 import { HiUserGroup } from "react-icons/hi";
 import { AiOutlineBranches } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
+import { GiBranchArrow } from "react-icons/gi";
 
 import CashierManagement from "./Dashboard/cashierAddtion";
 import CashierViews from "./Dashboard/cashierView";
 import ProductPage from "./Dashboard/Product/page";
 import Orders from "./Dashboard/OrdersShow/page";
 import Order from "./Dashboard/Orders/order";
+import BranchManagement from "./BranchManagement/page";
 const ManagerDashboardLayout = () => {
   const [show, handleShow] = useState(false);
 
@@ -124,6 +126,7 @@ const ManagerDashboardLayout = () => {
           {selected === "Orders" && <Orders />}
           {selected === "Products" && <ProductPage />}
           {selected === "Dashboard" && <Order />}
+          {selected === "Branches" && <BranchManagement />}
         </nav>
       </div>
       <div
@@ -232,6 +235,17 @@ const ManagerDashboardLayout = () => {
               >
                 <AiOutlineBranches className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
                 <span className="ms-3">View Cashier</span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#"
+                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                onClick={() => setSelected("Branches")}
+              >
+                <GiBranchArrow className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
+                <span className="ms-3">Branches</span>
               </a>
             </li>
 

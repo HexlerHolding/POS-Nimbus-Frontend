@@ -3,61 +3,182 @@ import { Modal } from "react-bootstrap";
 import orders from "./data.js";
 import ApexCharts from "apexcharts";
 import { BiDownload } from "react-icons/bi";
+import managerService from "../../../Services/managerService.js";
+import commonService from "../../../Services/common.js";
 
 const Order = () => {
+  const [loading, setLoading] = useState(true);
+
+  const [orders2, setOrders2] = useState([]);
+  const [numberOfOrders, setNumberOfOrders] = useState(0);
+  const [ordersInLast7Days, setOrdersInLast7Days] = useState(0);
+  const [totalSales, setTotalSales] = useState(0);
+  const [salesToday, setSalesToday] = useState(0);
+  const [averageOrder, setAverageOrder] = useState(0);
+  const [highestOrder, setHighestOrder] = useState(0);
+  const [activeOrders, setActiveOrders] = useState(0);
+  const [completedOrdersToday, setCompletedOrdersToday] = useState(0);
+  const [top3Products, setTop3Products] = useState([]);
+
+  useEffect(() => {
+    managerService.getBranchOrders().then((response) => {
+      if (response == "error") {
+        console.log("error");
+      } else {
+        setOrders2(response.data.orders);
+        console.log(response.data);
+        
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (orders2.length === 0) return;
+    const last7Days = orders2.filter((order) => {
+      return (
+        new Date(order.time) > new Date(new Date() - 7 * 24 * 60 * 60 * 1000) &&
+        new Date(order.time) < new Date()
+      );
+    });
+    setOrdersInLast7Days(last7Days.length);
+    setNumberOfOrders(orders2.length);
+    setTotalSales(
+      orders2.reduce((acc, order) => {
+        return acc + order.total;
+      }, 0)
+    );
+    setSalesToday(
+      orders2
+        .filter((order) => {
+          return (
+            order.time.split("T")[0] === new Date().toISOString().split("T")[0]
+          );
+        })
+        .reduce((acc, order) => {
+          return acc + order.total;
+        }, 0)
+    );
+    setAverageOrder(
+      orders2.reduce((acc, order) => {
+        return acc + order.total;
+      }, 0) / orders2.length
+    );
+    setHighestOrder(
+      Math.max(
+        ...orders2.map((order) => {
+          return order.total;
+        })
+      )
+    );
+    setActiveOrders(
+      orders2.filter((order) => {
+        return order.status === "pending" || order.status === "ready";
+      }).length
+    );
+
+    setCompletedOrdersToday(
+      orders2.filter((order) => {
+        return (
+          order.time.split("T")[0] === new Date().toISOString().split("T")[0] &&
+          order.status === "completed"
+        );
+      }).length
+    );
+    setLoading(false);
+  }, [orders2]);
+
+  const [ordersInLast7Days2, setOrdersInLast7Days2] = useState([]);
+  const [last7Dates, setLast7Dates] = useState([]);
+
+  useEffect(() => {
+    const dates = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(new Date() - i * 24 * 60 * 60 * 1000);
+      return `${date.getFullYear()}-${
+        date.getMonth() + 1 < 10
+          ? `0${date.getMonth() + 1}`
+          : date.getMonth() + 1
+      }-${date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()}`;
+    });
+    setLast7Dates(dates.reverse());
+
+    console.log(last7Dates);
+  }, []);
+
+  useEffect(() => {
+    if (orders2.length === 0) return;
+    const last7Days = orders2.filter((order) => {
+      return (
+        new Date(order.time) > new Date(new Date() - 7 * 24 * 60 * 60 * 1000) &&
+        new Date(order.time) < new Date()
+      );
+    });
+    //group by date
+    const groupedOrders = last7Days.reduce((acc, order) => {
+      const date = order.time.split("T")[0];
+      acc[date] = acc[date] ? acc[date] + order.total : order.total;
+
+      return acc;
+    }, {});
+
+    const ordersInLast7Days = last7Dates.map((date) => {
+      console.log("date", date);
+      return {
+        date: date,
+        total: groupedOrders[date] ? groupedOrders[date] : 0,
+      };
+    });
+
+    console.log("order", ordersInLast7Days);
+
+    setOrdersInLast7Days2(ordersInLast7Days);
+  }, [orders2]);
+
+  const [ordersByType, setOrdersByType] = useState([
+    { type: "", total: 0 },
+    { type: "", total: 0 },
+    { type: "", total: 0 },
+  ]);
+
+  useEffect(() => {
+    if (orders2.length === 0) return;
+    const deliveryOrders = orders2.filter((order) => {
+      return order.order_type === "delivery";
+    });
+
+    const takeoutOrders = orders2.filter((order) => {
+      return order.order_type === "takeaway";
+    });
+    const dineInOrders = orders2.filter((order) => {
+      return order.order_type === "dine-in";
+    });
+    const ordersByType = [
+      {
+        type: "delivery",
+        total: deliveryOrders.reduce((acc, order) => {
+          return acc + order.total;
+        }, 0),
+      },
+      {
+        type: "takeway",
+        total: takeoutOrders.reduce((acc, order) => {
+          return acc + order.total;
+        }, 0),
+      },
+      {
+        type: "dine-in",
+        total: dineInOrders.reduce((acc, order) => {
+          return acc + order.total;
+        }, 0),
+      },
+    ];
+
+    setOrdersByType(ordersByType);
+  }, [orders2]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const ordersToday = orders.filter((order) => {
-    return order.time.split("T")[0] === new Date().toISOString().split("T")[0];
-  });
-
-  const salesToday = ordersToday.reduce((acc, order) => {
-    return acc + order.total;
-  }, 0);
-
-  const last30Days = orders.filter((order) => {
-    return (
-      new Date(order.time) > new Date(new Date() - 30 * 24 * 60 * 60 * 1000)
-    );
-  });
-
-  const salesLast30Days = last30Days.reduce((acc, order) => {
-    return acc + order.total;
-  }, 0);
-
-  const totalOrders = orders.length;
-
-  const totalSales = orders.reduce(
-    (acc, order) => {
-      return acc + order.total;
-    },
-
-    0
-  );
-
-  const averageOrder = totalSales / totalOrders;
-
-  const highestOrder = orders.reduce((acc, order) => {
-    return Math.max(acc, order.total);
-  }, 0);
-
-  const numberOfRefunds = orders.filter((order) => {
-    //count the orders where order_status is refunded
-    return order.order_status === "Refunded";
-  }).length;
-
-  const totalTax = orders.reduce((acc, order) => {
-    return acc + order.tax;
-  }, 0);
-
-  //calculations for order trends
-  const ordersByDay = orders.reduce((acc, order) => {
-    const day = new Date(order.time).getDay();
-    acc[day] = acc[day] ? acc[day] + 1 : 1;
-    return acc;
-  }, {});
 
   //chart data for order trends
   useEffect(() => {
@@ -91,9 +212,7 @@ const Order = () => {
       dataLabels: {
         enabled: false,
       },
-      stroke: {
-        width: 6,
-      },
+
       grid: {
         show: false,
         strokeDashArray: 4,
@@ -101,17 +220,21 @@ const Order = () => {
           left: 2,
           right: 2,
           top: 0,
+          bottom: 2,
         },
       },
       series: [
         {
-          name: "Orders",
-          data: Object.values(ordersByDay),
+          name: "Sales",
+          data: ordersInLast7Days2.map((order) => order.total),
+
           color: "#1A56DB",
         },
       ],
       xaxis: {
-        categories: ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"],
+        categories: last7Dates.map((date) =>
+          date.split("-").slice(1).join("-")
+        ),
         labels: {
           style: {
             colors: "#828D99",
@@ -120,8 +243,6 @@ const Order = () => {
         },
       },
       yaxis: {
-        min: 0,
-        max: Math.max(...Object.values(ordersByDay)),
         labels: {
           style: {
             colors: "#828D99",
@@ -142,20 +263,7 @@ const Order = () => {
     return () => {
       chart.destroy();
     };
-  }, [ordersByDay]);
-
-  //create data for delivery vs pickup chart
-  const deliveryVsPickup = orders.reduce(
-    (acc, order) => {
-      if (order.order_type === "Delivery") {
-        acc.delivery += 1;
-      } else if (order.order_type === "Pickup") {
-        acc.pickup += 1;
-      }
-      return acc;
-    },
-    { delivery: 0, pickup: 0 }
-  );
+  }, [ordersInLast7Days2, last7Dates]);
 
   //now create a pie chart for delivery vs pickup
   useEffect(() => {
@@ -171,9 +279,13 @@ const Order = () => {
       dataLabels: {
         enabled: false,
       },
-      series: [deliveryVsPickup.delivery, deliveryVsPickup.pickup],
-      labels: ["Delivery", "Pickup"],
-      colors: ["#1A56DB", "#F87171"],
+      series: [
+        ordersByType[0].total,
+        ordersByType[1].total,
+        ordersByType[2].total,
+      ],
+      labels: ["delivery", "takeaway", "dine-in"],
+      colors: ["#1A56DB", "#F87171", "#34D399"],
       //change label colors
 
       legend: {
@@ -219,116 +331,13 @@ const Order = () => {
     return () => {
       chart.destroy();
     };
-  }, [deliveryVsPickup]);
+  }, [ordersByType]);
 
-  useEffect(() => {
-    //get orders for last 7 days only than 2021-09-01T12:00:00Z
-    const last7Days = orders.filter((order) => {
-      return (
-        new Date(order.time) >
-          new Date(
-            new Date("2021-09-01T12:00:00Z") - 7 * 24 * 60 * 60 * 1000
-          ) && new Date(order.time) < new Date("2021-09-08T12:00:00Z")
-      );
-    });
-
-    // Prepare the data
-    const categories = Array.from(
-      new Set(last7Days.map((order) => order.time.split("T")[0]))
-    );
-    const seriesData = {
-      Cash: new Array(categories.length).fill(0),
-      Card: new Array(categories.length).fill(0),
-      PayPal: new Array(categories.length).fill(0),
-    };
-
-    last7Days.forEach((order) => {
-      const date = order.time.split("T")[0];
-      const index = categories.indexOf(date);
-
-      if (order.payment_method === "Cash") {
-        seriesData.Cash[index] += order.total;
-      } else if (order.payment_method === "Credit Card") {
-        seriesData.Card[index] += order.total;
-      } else if (order.payment_method === "PayPal") {
-        seriesData.PayPal[index] += order.total;
-      }
-    });
-
-    const options = {
-      chart: {
-        height: "100%",
-        type: "bar",
-        fontFamily: "Inter, sans-serif",
-        toolbar: {
-          show: true,
-        },
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: "55%",
-          endingShape: "rounded",
-        },
-      },
-      colors: ["#1A56DB", "#F87171", "#34D399"],
-      series: [
-        {
-          name: "Cash",
-          data: seriesData.Cash,
-        },
-        {
-          name: "Card",
-          data: seriesData.Card,
-        },
-        {
-          name: "PayPal",
-          data: seriesData.PayPal,
-        },
-      ],
-      xaxis: {
-        categories: categories,
-        labels: {
-          style: {
-            colors: "#828D99",
-            fontSize: "14px",
-          },
-        },
-      },
-      yaxis: {
-        min: 0,
-        labels: {
-          style: {
-            colors: "#828D99",
-            fontSize: "14px",
-          },
-        },
-      },
-      legend: {
-        show: true,
-        labels: {
-          colors: "#000000",
-        },
-      },
-    };
-
-    const chart = new ApexCharts(document.getElementById("bar-chart"), options);
-    chart.render();
-
-    return () => {
-      chart.destroy();
-    };
-  }, [orders]);
-
-  const [top3Products, setTop3Products] = useState([]);
   const [productQuantities, setProductQuantities] = useState([]);
 
   //get top 3 products
   useEffect(() => {
-    const products = orders.reduce((acc, order) => {
+    const products = orders2.reduce((acc, order) => {
       order.cart.forEach((item) => {
         acc[item.product_name] = acc[item.product_name]
           ? acc[item.product_name] + item.quantity
@@ -344,7 +353,7 @@ const Order = () => {
     const top3 = sortedProducts.slice(0, 3);
     setTop3Products(top3);
     setProductQuantities(top3.map((product) => products[product]));
-  }, [orders]);
+  }, [orders2]);
 
   //show with a pie chart
   useEffect(() => {
@@ -386,16 +395,17 @@ const Order = () => {
     const chart = new ApexCharts(document.getElementById("pie-chart"), options);
     chart.render();
 
+
     return () => {
       chart.destroy();
     };
-  }, [orders, top3Products, productQuantities]);
+  }, [orders2, top3Products, productQuantities]);
 
   // Pagination calculations
   const totalPages = Math.ceil(orders.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedOrders = orders.slice(startIndex, endIndex);
+  const paginatedOrders = orders2.slice(startIndex, endIndex);
 
   const handlePreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
@@ -406,8 +416,8 @@ const Order = () => {
   };
 
   const onClickDownloadOrdersData = () => {
-    const csv = orders.map((order) => {
-      return `${order.order_id},${order.customer_name},${order.address},${order.total},${order.order_status},${order.payment_method},${order.order_type},${order.time},${order.tax}`;
+    const csv = orders2.map((order) => {
+      return `${order._id},${order.customer_name},${order.address},${order.total},${order.status},${order.payment_method},${order.order_type}`;
     });
 
     const csvData = csv.join("\n");
@@ -422,6 +432,29 @@ const Order = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {loading ? (
+        <div className="flex justify-center items-center fixed bg-white bg-opacity-50 top-0 left-0 w-full h-full z-50">
+          <div role="status">
+            <svg
+              aria-hidden="true"
+              class="w-24 h-24 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+              viewBox="0 0 100 101"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                fill="currentColor"
+              />
+              <path
+                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                fill="currentFill"
+              />
+            </svg>
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      ) : null}
       <div className="flex items-center justify-between p-5 gap-5">
         <div
           className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
@@ -431,7 +464,22 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Total Orders</p>
-            <p className="text-3xl text-black font-semibold">{totalOrders}</p>
+            <p className="text-3xl text-black font-semibold">
+              {numberOfOrders}
+            </p>
+          </div>
+        </div>
+        <div
+          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
+          style={{
+            background: "#ffffff",
+          }}
+        >
+          <div>
+            <p className="text-black text-md mb-0">Orders in Last 7 Days</p>
+            <p className="text-3xl text-black font-semibold">
+              {ordersInLast7Days}
+            </p>
           </div>
         </div>
         <div
@@ -442,7 +490,9 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Total Sales</p>
-            <p className="text-3xl text-black font-semibold">${totalSales}</p>
+            <p className="text-3xl text-black font-semibold">
+              {totalSales.toFixed(2)}
+            </p>
           </div>
         </div>
         <div
@@ -453,19 +503,8 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Sales Today</p>
-            <p className="text-3xl text-black font-semibold">${salesToday}</p>
-          </div>
-        </div>
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Sales Last 30 Days</p>
             <p className="text-3xl text-black font-semibold">
-              ${salesLast30Days}
+              {salesToday.toFixed(2)}
             </p>
           </div>
         </div>
@@ -479,7 +518,9 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Average Order</p>
-            <p className="text-3xl text-black font-semibold">${averageOrder}</p>
+            <p className="text-3xl text-black font-semibold">
+              {averageOrder.toFixed(2)}
+            </p>
           </div>
         </div>
         <div
@@ -500,10 +541,8 @@ const Order = () => {
           }}
         >
           <div>
-            <p className="text-black text-md mb-0">Number of Refunds</p>
-            <p className="text-3xl text-black font-semibold">
-              {numberOfRefunds}
-            </p>
+            <p className="text-black text-md mb-0">Active Orders</p>
+            <p className="text-3xl text-black font-semibold">{activeOrders}</p>
           </div>
         </div>
         <div
@@ -513,16 +552,18 @@ const Order = () => {
           }}
         >
           <div>
-            <p className="text-black text-md mb-0">Total Tax Collected</p>
-            <p className="text-3xl text-black font-semibold">${totalTax}</p>
+            <p className="text-black text-md mb-0">Completed Orders Today</p>
+            <p className="text-3xl text-black font-semibold">
+              {completedOrdersToday}
+            </p>
           </div>
         </div>
       </div>
       <div className="flex justify-between p-5 gap-5 h-96">
-        <div id="area-chart" className="w-1/4"></div>
         <div id="donut-chart" className="w-1/4"></div>
-        <div id="bar-chart" className="w-1/4"></div>
+
         <div id="pie-chart" className="w-1/4"></div>
+        <div id="area-chart" className="w-1/2"></div>
       </div>
       <div class="relative overflow-x-auto shadow-md rounded-lg p-5">
         <div className="w-full justify-end flex">
@@ -571,7 +612,7 @@ const Order = () => {
               >
                 <td class="px-6 py-4">
                   <div class="flex items-center space-x-3">
-                    <p>{order.order_id}</p>
+                    <p>{commonService.handleCode(order._id)}</p>
                   </div>
                 </td>
                 <td class="px-6 py-4">
@@ -584,7 +625,7 @@ const Order = () => {
                   <p>{order.total}</p>
                 </td>
                 <td class="px-6 py-4">
-                  <p>{order.order_status}</p>
+                  <p>{order.status}</p>
                 </td>
                 <td class="px-6 py-4">
                   <p>{order.payment_method}</p>
@@ -648,7 +689,7 @@ const Order = () => {
               <strong>Order Type:</strong> {selectedOrder?.order_type}
             </p>
             <p>
-              <strong>Order Status:</strong> {selectedOrder?.order_status}
+              <strong>Order Status:</strong> {selectedOrder?.status}
             </p>
           </div>
           <div className="flex items-center justify-between mb-2 mt-2">

@@ -16,7 +16,7 @@ const DashboardLayout = () => {
 
   const [showUser, handleShowUser] = useState(false);
 
-  const [selected, setSelected] = useState("Orders");
+  const [selected, setSelected] = useState("Dashboard");
 
   return (
     <div className="">

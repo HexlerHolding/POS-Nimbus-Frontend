@@ -1,25 +1,55 @@
 import React, { useState, useEffect } from "react";
 import ApexCharts from "apexcharts";
+import AdminService from "../../../Services/adminService";
 
 const Donut = () => {
+  const [salesData, setSalesData] = useState({});
+  const [branchNames, setBranchNames] = useState([]);
+  const [branchSales, setBranchSales] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await AdminService.getBranchSales();
+      if (response.error) {
+        console.log(response.error);
+      } else {
+        setSalesData(response.data);
+        console.log("sales data", response.data);
+        //map branch names and sales
+        const names = [];
+        const sales = [];
+        response.data.forEach((branch) => {
+          names.push(branch.branch);
+          sales.push(branch.sales);
+        });
+        setBranchNames(names);
+        setBranchSales(sales);
+
+        console.log("branch names", names);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const convertToK = (value) => {
+    return value / 1000;
+  };
+
   useEffect(() => {
     const chartOptions = {
-      series: [35.1, 23.5, 2.4, 5.4],
+      series: branchSales,
       colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694"],
       chart: {
-        height: 320,
         width: "100%",
         type: "donut",
       },
-      stroke: {
-        colors: ["transparent"],
-        lineCap: "",
-      },
+
       plotOptions: {
         pie: {
           donut: {
             labels: {
               show: true,
+              color: "#000000",
               name: {
                 show: true,
                 fontFamily: "Inter, sans-serif",
@@ -29,21 +59,23 @@ const Donut = () => {
               total: {
                 showAlways: true,
                 show: true,
-                label: "Unique visitors",
+                label: "Total",
                 fontFamily: "Inter, sans-serif",
+                color: "#ffffff",
                 formatter: function (w) {
                   const sum = w.globals.seriesTotals.reduce((a, b) => {
                     return a + b;
                   }, 0);
-                  return "$" + sum + "k";
+                  return convertToK(sum) + "k";
                 },
               },
               value: {
                 show: true,
                 fontFamily: "Inter, sans-serif",
+                color: "#ffffff",
                 offsetY: -20,
                 formatter: function (value) {
-                  return value + "k";
+                  return convertToK(value) + "k";
                 },
               },
             },
@@ -56,26 +88,30 @@ const Donut = () => {
           top: -2,
         },
       },
-      labels: ["Direct", "Sponsor", "Affiliate", "Email marketing"],
+      labels: branchNames,
       dataLabels: {
         enabled: false,
       },
       legend: {
         position: "bottom",
         fontFamily: "Inter, sans-serif",
+        labels: {
+          colors: "#ffffff",
+        },
       },
       yaxis: {
         labels: {
           formatter: function (value) {
-            return value + "k";
+            return value;
           },
         },
       },
       xaxis: {
         labels: {
           formatter: function (value) {
-            return value + "k";
+            return value;
           },
+          colors: "#000000",
         },
         axisTicks: {
           show: false,
@@ -96,14 +132,25 @@ const Donut = () => {
     return () => {
       chart.destroy();
     };
-  }, []);
+  }, [branchSales, branchNames]);
+
+  const onClickDownloadAsCsv = () => {
+    const csv = branchNames.map((branch, index) => {
+      return `${branch},${branchSales[index]}\n`;
+    });
+    const hiddenElement = document.createElement("a");
+    hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+    hiddenElement.target = "_blank";
+    hiddenElement.download = "sales.csv";
+    hiddenElement.click();
+  };
 
   return (
-    <div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
-      <div class="flex justify-between mb-3">
-        <div class="flex justify-center items-center">
-          <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">
-            Website traffic
+    <div class="w-1/4 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 h-96">
+      <div class="flex justify-between mb-10">
+        <div class="flex justify-center items-center ">
+          <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1 ">
+            Sales distribution
           </h5>
           <svg
             data-popover-target="chart-info"
@@ -190,164 +237,17 @@ const Donut = () => {
             <span class="sr-only">Download data</span>
           </button>
           <div
+            onClick={onClickDownloadAsCsv}
             id="data-tooltip"
             role="tooltip"
             class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
           >
             Download CSV
-            <div class="tooltip-arrow" data-popper-arrow></div>
           </div>
         </div>
       </div>
 
-      <div>
-        <div class="flex" id="devices">
-          <div class="flex items-center me-4">
-            <input
-              id="desktop"
-              type="checkbox"
-              value="desktop"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              for="desktop"
-              class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Desktop
-            </label>
-          </div>
-          <div class="flex items-center me-4">
-            <input
-              id="tablet"
-              type="checkbox"
-              value="tablet"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              for="tablet"
-              class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Tablet
-            </label>
-          </div>
-          <div class="flex items-center me-4">
-            <input
-              id="mobile"
-              type="checkbox"
-              value="mobile"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              for="mobile"
-              class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              Mobile
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="py-6" id="donut-chart"></div>
-
-      <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
-        <div class="flex justify-between items-center pt-5">
-          <button
-            id="dropdownDefaultButton"
-            data-dropdown-toggle="lastDaysdropdown"
-            data-dropdown-placement="bottom"
-            class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-            type="button"
-          >
-            Last 7 days
-            <svg
-              class="w-2.5 m-2.5 ms-1.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 6"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m1 1 4 4 4-4"
-              />
-            </svg>
-          </button>
-          <div
-            id="lastDaysdropdown"
-            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
-          >
-            <ul
-              class="py-2 text-sm text-gray-700 dark:text-gray-200"
-              aria-labelledby="dropdownDefaultButton"
-            >
-              <li>
-                <a
-                  href="#"
-                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Yesterday
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Today
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Last 7 days
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Last 30 days
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Last 90 days
-                </a>
-              </li>
-            </ul>
-          </div>
-          <a
-            href="#"
-            class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
-          >
-            Traffic analysis
-            <svg
-              class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 6 10"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m1 9 4-4-4-4"
-              />
-            </svg>
-          </a>
-        </div>
-      </div>
+      <div  id="donut-chart" className="h-96"></div>
     </div>
   );
 };
