@@ -19,7 +19,7 @@ const CashierDashboardLayout = () => {
     <div className="">
       <div className="">
         <nav className="bg-white border-gray-200 dark:bg-gray-100">
-          <div className=" flex flex-wrap items-center justify-between w-1/2 p-4">
+          <div className={`flex flex-wrap items-center justify-between ${selected == "Home"? "w-2/3" : "w-full" } p-4`}>
             <a className="flex items-center space-x-3 rtl:space-x-reverse">
               <img src={Logo} className="h-8" alt="Flowbite Logo" />
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-gray-800">
