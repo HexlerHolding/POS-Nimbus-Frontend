@@ -43,18 +43,13 @@ const Orders = () => {
     getOrders();
   }, []);
 
-  const [paymentMethods, setPaymentMethods] = useState([
-    "Cash",
-    "Credit Card",
-    "Debit Card",
-    "PayPal",
-    "Net Banking",
-  ]);
+  const [paymentMethods, setPaymentMethods] = useState(["cash", "card"]);
 
   const [orderStatus, setOrderStatus] = useState([
-    "Pending",
-    "Delivered",
-    "Refunded",
+    "pending",
+    "ready",
+    "completed",
+    "cancelled",
   ]);
 
   useEffect(() => {
@@ -66,6 +61,8 @@ const Orders = () => {
       setFilteredOrders(data.filter((order) => order.status === "completed"));
     } else if (activeOption === "Ready Orders") {
       setFilteredOrders(data.filter((order) => order.status === "ready"));
+    } else if (activeOption === "Cancelled Orders") {
+      setFilteredOrders(data.filter((order) => order.status === "cancelled"));
     }
   }, [activeOption]);
 
@@ -108,6 +105,25 @@ const Orders = () => {
     setstatus("");
     setActiveOption("All Orders");
     setFilteredOrders(data);
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      const response = await cashierService.markOrderCancelled(orderId);
+      if (response.data) {
+        console.log(response.data);
+        getOrders();
+      }
+      alert("Order Cancelled Successfully");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const grandTotal = (total, discount, tax) => {
+    let grandTotal = total - (total * discount) / 100;
+    grandTotal = grandTotal + (grandTotal * tax) / 100;
+    return grandTotal.toFixed(2);
   };
 
   return (
@@ -260,6 +276,14 @@ const Orders = () => {
           </button>
           <button
             className={`${
+              activeOption === "Ready Orders" ? "bg-green-500" : "bg-gray-800"
+            } text-white px-5 py-2 rounded-lg`}
+            onClick={() => setActiveOption("Ready Orders")}
+          >
+            Ready Orders
+          </button>
+          <button
+            className={`${
               activeOption === "Completed Orders"
                 ? "bg-green-500"
                 : "bg-gray-800"
@@ -270,11 +294,13 @@ const Orders = () => {
           </button>
           <button
             className={`${
-              activeOption === "Ready Orders" ? "bg-green-500" : "bg-gray-800"
+              activeOption === "Cancelled Orders"
+                ? "bg-green-500"
+                : "bg-gray-800"
             } text-white px-5 py-2 rounded-lg`}
-            onClick={() => setActiveOption("Ready Orders")}
+            onClick={() => setActiveOption("Cancelled Orders")}
           >
-            Ready Orders
+            Cancelled Orders
           </button>
         </div>
       </div>
@@ -288,11 +314,11 @@ const Orders = () => {
         {filteredOrders.map((order, index) => (
           <div
             key={index}
-            className="relative w-full p-5 rounded-lg items-center gap-5 h-96 justify-between card border-dashed border-2 border-gray-300 cursor-default"
+            className="relative w-full p-5 rounded-lg items-center gap-5 h-auto justify-between card border-dashed border-2 border-gray-300 cursor-default"
           >
             <div>
               <div className="flex items-center justify-between">
-                <p className="text-xl mb-10">
+                <p className="font-semibold text-xl mb-10">
                   Order ID: {commonService.handleCode(order._id)}
                 </p>
                 <p
@@ -301,33 +327,45 @@ const Orders = () => {
                       ? "bg-yellow-200 text-yellow-700"
                       : order.status === "completed"
                       ? "bg-green-200 text-green-800"
-                      : "bg-red-200 text-red-800"
+                      : order.status === "cancelled"
+                      ? "bg-red-200 text-red-800"
+                      : "bg-blue-200 text-blue-800"
                   }`}
                 >
                   {order.status}
                 </p>
               </div>
-              <p className="text-md mb-10">
-                Customer Name: {order.customer_name}
-              </p>
-              <p className="text-md mb-10">
-                Order Date: {order.time.split("T")[0]}
-              </p>
-              <p className="text-md mb-10">
-                Order Time: {order.time.split("T")[1].split("Z")[0]}
-              </p>
+              <div className="flex text-md mb-5">
+                Customer Name:&nbsp;
+                <p className="font-semibold">{order.customer_name}</p>
+              </div>
+              <div className="flex text-md mb-5">
+                Order Date:&nbsp;
+                <p className="font-semibold">{order.time.split("T")[0]}</p>
+              </div>
+              <div className="flex text-md mb-5">
+                Order Time:&nbsp;
+                <p className="font-semibold">
+                  {order.time.split("T")[1].split("Z")[0]}
+                </p>
+              </div>
               <div className="w-full border-t-2 flex items-center p-2">
                 <div>
                   <p className="text-md">Total Amount: {order.total} /-</p>
                 </div>
-                <p className="text-md ml-auto">Tax: {order.tax} %</p>
+                <p className="text-sm ml-auto">Discount: {order.discount}%</p>
+                <p className="text-sm ml-auto">Tax: {order.tax}%</p>
               </div>
               <div className="w-full border-t-2 flex items-center p-2">
                 <p className="text-md p-2">
-                  Grand Total: {(order.total + order.tax).toFixed(2)} /-
+                  Grand Total:{" "}
+                  {grandTotal(order.total, order.discount, order.tax)} /-
                 </p>
-                {order.status === "Pending" && (
-                  <button className="text-blue-500 underline rounded-lg ml-auto">
+                {order.status === "pending" && (
+                  <button
+                    className="text-blue-500 underline rounded-lg ml-auto"
+                    onClick={() => handleCancelOrder(order._id)}
+                  >
                     Cancel Order
                   </button>
                 )}

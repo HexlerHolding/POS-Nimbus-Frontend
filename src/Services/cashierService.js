@@ -102,6 +102,21 @@ const cashierService = {
     }
   },
 
+  markOrderCancelled: async (orderId) => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/cashier/order/${orderId}/cancel`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
   getTaxes: async () => {
     try {
       const response = await axios.get(`${BASE_URL}/cashier/taxes`, {

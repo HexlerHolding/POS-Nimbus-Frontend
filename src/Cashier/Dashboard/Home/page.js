@@ -34,9 +34,23 @@ const Home = () => {
   const [filter, setFilter] = useState("");
   const [inBranch, setInBranch] = useState(true);
   const [orderToComplete, setOrderToComplete] = useState("");
+  const [cardTax, setCardTax] = useState(0);
+  const [cashTax, setCashTax] = useState(0);
 
   const [showBranchIsClosed, setShowBranchIsClosed] = useState(false);
   const dispatch = useDispatch();
+
+  const getTax = async () => {
+    const response = await CashierService.getTaxes();
+    if (response.error) {
+      console.log(response.error);
+    } else {
+      console.log(response.data);
+
+      setCashTax(response.data.cash_tax);
+      setCardTax(response.data.card_tax);
+    }
+  };
 
   const getProducts = async () => {
     const response = await CashierService.getProducts();
@@ -92,7 +106,7 @@ const Home = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       getBranchStatus();
-    }, 1000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -118,6 +132,7 @@ const Home = () => {
   useEffect(() => {
     getProducts();
     getActiveOrders();
+    getTax();
     setFilter("");
   }, []);
 
@@ -240,9 +255,23 @@ const Home = () => {
     }
   }, []);
 
+  const grandTotal = (order) => {
+    var total = order.total;
+
+    if (order.discount > 0) {
+      total -= (total * order.discount) / 100;
+    }
+
+    if (order.tax > 0) {
+      total += (total * order.tax) / 100;
+    }
+
+    return total.toFixed(2);
+  };
+
   return (
     <div className="home flex">
-      <div className="p-20 bg-white w-2/3">
+      <div className="p-10 bg-white w-2/3">
         <h1 className="text-xl text-blue-500">Products</h1>
         <input
           type="text"
@@ -268,7 +297,7 @@ const Home = () => {
           ))}
         </div>
       </div>
-      <div className="p-20 bg-white w-1/3 cart fixed right-0 top-0 h-screen border-l overflow-y-auto">
+      <div className="p-10 bg-white w-1/3 cart fixed right-0 top-0 h-screen border-l overflow-y-auto">
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-xl text-blue-500 mb-3">Cart</h1>
           <button
@@ -311,7 +340,13 @@ const Home = () => {
           <p className="text-gray-700">Total: PKR {cart.total}/-</p>
           <button
             className="bg-green-500 text-white p-2 rounded hover:bg-green-700"
-            onClick={() => setShowDetailsForm(true)}
+            onClick={() => {
+              if (cart.items.length === 0) {
+                alert("Cart is empty");
+                return;
+              }
+              setShowDetailsForm(true);
+            }}
           >
             Checkout
           </button>
@@ -349,23 +384,12 @@ const Home = () => {
                     {order.cart.map((orderItem) => (
                       <div key={orderItem._id} className="flex justify-between">
                         <p>{orderItem.product_name}</p>
-                        <p>PKR {orderItem.price}/-</p>
+                        <p>{orderItem.quantity}</p>
                       </div>
                     ))}
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <p>
-                      Total: PKR{" "}
-                      {order.payment_method === "card"
-                        ? (
-                            order.total +
-                            (order.total * card_tax) / 100
-                          ).toFixed(2)
-                        : (
-                            order.total +
-                            (order.total * cash_tax) / 100
-                          ).toFixed(2)}
-                    </p>
+                    <p>Total: PKR {grandTotal(order)}</p>
                     <button
                       className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm"
                       onClick={() => {
@@ -425,6 +449,7 @@ const Home = () => {
               className="form-check-input"
               id="inBranch"
               value={inBranch}
+              defaultChecked={inBranch}
             />
             <label htmlFor="inBranch" className="form-check-label mb-1 ml-2">
               In Branch
@@ -459,7 +484,7 @@ const Home = () => {
                   }`}
                   id="address"
                   disabled={inBranch}
-                  value={details.address}
+                  value={inBranch ? "In Branch" : details.address}
                   onChange={(e) =>
                     setDetails({
                       ...details,
@@ -489,8 +514,8 @@ const Home = () => {
                   Tax
                 </label>
                 <input
-                  type="number"
-                  className="form-control border border-gray-300 w-full p-2 rounded mt-2"
+                  type="text"
+                  className="form-control border border-gray-300 w-full p-2 rounded mt-2 disabled"
                   id="tax"
                   value={details.tax}
                   onChange={(e) =>
@@ -538,10 +563,19 @@ const Home = () => {
                     } me-2`}
                     onClick={(e) => {
                       e.preventDefault();
-                      setDetails({
-                        ...details,
-                        payment_method: payment_method,
-                      });
+                      if (payment_method === "card") {
+                        setDetails({
+                          ...details,
+                          payment_method: payment_method,
+                          tax: cardTax,
+                        });
+                      } else if (payment_method === "cash") {
+                        setDetails({
+                          ...details,
+                          payment_method: payment_method,
+                          tax: cashTax,
+                        });
+                      }
                     }}
                   >
                     {payment_method}
