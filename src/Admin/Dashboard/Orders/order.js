@@ -435,6 +435,21 @@ const Order = () => {
     window.URL.revokeObjectURL(url);
   };
 
+  const grandTotal = (order) => {
+    if(!order) return 0;
+    var total = order.total;
+
+    if (order.discount > 0) {
+      total -= (total * order.discount) / 100;
+    }
+
+    if (order.tax > 0) {
+      total += (total * order.tax) / 100;
+    }
+
+    return total.toFixed(2);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex items-center justify-between p-5 gap-5">
@@ -660,7 +675,8 @@ const Order = () => {
         <Modal.Body className="p-2">
           <div className="flex items-center justify-between mb-2 mt-2">
             <p>
-              <strong>Order ID:</strong> {selectedOrder?.order_id}
+              <strong>Order ID:</strong>{" "}
+              {selectedOrder ? commonService.handleID(selectedOrder._id) : ""}
             </p>
             <p>
               <strong>Customer Name:</strong> {selectedOrder?.customer_name}
@@ -687,11 +703,19 @@ const Order = () => {
               <strong>Time:</strong> {selectedOrder?.time}
             </p>
             <p>
-              <strong>Tax:</strong> {selectedOrder?.tax}
+              <strong>Discount:</strong> {selectedOrder?.discount}%
             </p>
           </div>
-          <p className="mb-2">
-            <strong>Total:</strong> PKR {selectedOrder?.total} /-
+          <div className="flex items-center justify-between mb-2 mt-2">
+            <p>
+              <strong>Total:</strong> PKR {selectedOrder?.total} /-
+            </p>
+            <p>
+              <strong>Tax:</strong> {selectedOrder?.tax}%
+            </p>
+          </div>
+          <p className="mt-2 mb-2">
+            <strong>Grand Total:</strong> PKR {grandTotal(selectedOrder)} /-
           </p>
           <p className="mt-2 mb-2">
             <strong>Cart:</strong>
