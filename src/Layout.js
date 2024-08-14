@@ -2,6 +2,7 @@ import React from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./Home/page";
+import Contact from "./Home/contact";
 import AdminLogin from "./Admin/Login/page";
 import UserLogin from "./UserLogin/page";
 import DashboardLayout from "./Admin/Dashboard/DashboardLayout";
@@ -15,6 +16,7 @@ const Layout = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/user/login" element={<UserLogin />} />
       <Route path="/admin/dashboard" element={<DashboardLayout />} />

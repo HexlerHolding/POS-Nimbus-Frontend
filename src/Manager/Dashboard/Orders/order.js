@@ -27,7 +27,6 @@ const Order = () => {
       } else {
         setOrders2(response.data.orders);
         console.log(response.data);
-        
       }
     });
   }, []);
@@ -394,7 +393,6 @@ const Order = () => {
     };
     const chart = new ApexCharts(document.getElementById("pie-chart"), options);
     chart.render();
-
 
     return () => {
       chart.destroy();
