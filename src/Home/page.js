@@ -5,6 +5,7 @@ import {
   Pagination,
   Scrollbar,
   A11y,
+  Autoplay,
   Controller,
 } from "swiper/modules";
 import "swiper/css"; // basic Swiper styles
@@ -17,21 +18,42 @@ import HowItWorks from "./howItWorks";
 import Section from "./section";
 import animatedburger from "../Assets/animated.png";
 
+import c from "../Assets/c.png";
+import c1 from "../Assets/c1.png";
+import adminscreen from "../Assets/adminscreen.png";
+import k from "../Assets/k.png";
+import m2 from "../Assets/m2.png";
+
 const data = [
   {
-    title: "Friendly Chatbot",
+    image: m2,
+    title: "Manager's Dashboard",
     content:
-      "Redefining mental wellness with a minimalist and soft dashboard: your partner in the fight against anxiety and depression",
+      "Nimbus360 provides a robust manager dashboard that allows you to oversee operations, manage staff, and track performance. Monitor sales, generate reports, and make data-driven decisions with our comprehensive platform.",
   },
   {
-    title: "Customized Lessons",
+    image: adminscreen,
+    title: "Admin's Dashboard",
     content:
-      "Redefining mental wellness with a minimalist and soft dashboard: your partner in the fight against anxiety and depression",
+      "Nimbus360 offers a robust admin dashboard that allows you to manage user roles, settings, and permissions. Monitor sales, generate reports, and track performance with our comprehensive platform.",
   },
   {
-    title: "Daily Progress",
+    image: c,
+    title: "Cashier's Dashboard",
     content:
-      "Redefining mental wellness with a minimalist and soft dashboard: your partner in the fight against anxiety and depression",
+      "Nimbus360 provides a comprehensive point of sale dashboard for cashiers, allowing them to manage transactions with ease. Punch new orders, apply discounts, and process payments seamlessly with our intuitive interface.",
+  },
+  {
+    image: c1,
+    title: "Cashier's Dashboard",
+    content:
+      "Cashiers can also view order history. Our platform is designed to streamline your operations and enhance the customer experience.",
+  },
+  {
+    image: k,
+    title: "Kitchen Staff's Dashboard",
+    content:
+      "Nimbus360 offers a dedicated kitchen staff dashboard that allows your team to manage orders efficiently. Mark orders as ready, view order details, and communicate with cashiers seamlessly.",
   },
 ];
 
@@ -76,45 +98,54 @@ const Home = () => {
       <div className="mt-0">
         <Membership />
       </div>
-      <div className="mt-0">
+      <div className="pt-40 bg-blue-900">
+        <h1 className="text-4xl font-bold text-white text-center">
+          About Nimbus360 Solutions
+        </h1>
+        <p className="text-lg text-gray-200 text-center mt-5">
+          Ready to power your business? <br></br> Nimbus360 Solutions is here to
+          help you streamline your operations and grow your business.
+        </p>
         <AboutUs />
       </div>
-      <div>
+      <div className="pt-20 bg-blue-900 pb-20">
+        <h1 className="text-4xl font-bold text-white text-center">
+          How It Works
+        </h1>
+        <p className="text-lg text-gray-200 text-center mt-5 mb-20">
+          We provide a cashiers dashboard, managers dashboard, kitchen staff
+          dashboard, and admin dashboard. <br></br> Our platform is designed to
+          incorporate all key roles within your establishment.
+        </p>
         <Swiper
-          modules={[Navigation, Pagination, Scrollbar, A11y, Controller]}
+          modules={[Navigation, Pagination, Scrollbar, A11y, Controller, Autoplay]}
           spaceBetween={0}
           slidesPerView={1}
           pagination={{ clickable: true }}
           scrollbar={{ draggable: true }}
           onSwiper={(swiper) => console.log(swiper)}
+          autoplay={{ delay: 5000 }}
+          
         >
           {data.map((item, index) => (
             <SwiperSlide key={index}>
-              <div className="items-center flex flex-col justify-center h-screen mx-auto mt-0 pt-0">
+              <div
+                className="items-center flex flex-row justify-center mx-auto mt-0 pt-0 bg-blue-900 p-20"
+                style={{ height: "500px" }}
+              >
                 <img
                   src={item.image}
                   alt="Display"
-                  className=" Display text-center justify-center"
+                  className=" Display text-center justify-center object-center object-fit w-1/2"
                 />
-                <div className="text">
-                  <h3 className="text-4xl font-bold py-3">{item.title}</h3>
-                  <p className="text-2xl mt-10">{item.content}</p>
+                <div className="text-md text-left justify-center object-center object-fit h-1/2 w-1/2 p-10 text-white">
+                  <h3 className="text-2xl font-bold py-3">{item.title}</h3>
+                  <p className="text-xl mt-10">{item.content}</p>
                 </div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
-
-      <div className="mt-0">
-        <h1 className="text-4xl font-bold text-slate-900 text-center">
-          How It Works
-        </h1>
-        <p className="text-lg text-gray-500 text-center mt-5">
-          Ready to power your project?<br></br> Join Dyno Dash today and access
-          top equipment and talent instantly!
-        </p>
-        <HowItWorks />
       </div>
     </div>
   );
