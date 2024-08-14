@@ -7,19 +7,45 @@ import { BiLogOut } from "react-icons/bi";
 
 import Home from "./Home/page";
 import Orders from "./Orders/page";
+import useStore from "../../Store/store";
+import AuthService from "../../Services/authService";
 
 const CashierDashboardLayout = () => {
   const [show, handleShow] = useState(false);
-
   const [showUser, handleShowUser] = useState(false);
-
   const [selected, setSelected] = useState("Home");
+  const { userRole, setUserRole } = useStore();
 
-  return (
+  useEffect(() => {
+    console.log(userRole);
+    if (userRole === "null" || userRole === null || userRole !== "cashier") {
+      window.location.href = "/cashier/login";
+    }
+  }, [userRole]);
+
+  const handleLogout = async () => {
+    try {
+      const response = await AuthService.logout();
+      console.log(response);
+      if (response.data.message) {
+        setUserRole(null);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return userRole !== "cashier" ? (
+    <></>
+  ) : (
     <div className="">
       <div className="">
         <nav className="bg-white border-gray-200 dark:bg-gray-100">
-          <div className={`flex flex-wrap items-center justify-between ${selected == "Home"? "w-2/3" : "w-full" } p-4`}>
+          <div
+            className={`flex flex-wrap items-center justify-between ${
+              selected == "Home" ? "w-2/3" : "w-full"
+            } p-4`}
+          >
             <a className="flex items-center space-x-3 rtl:space-x-reverse">
               <img src={Logo} className="h-8" alt="Flowbite Logo" />
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-gray-800">
@@ -168,6 +194,7 @@ const CashierDashboardLayout = () => {
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                onClick={handleLogout}
               >
                 <BiLogOut className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
                 <span className="flex-1 ms-3 whitespace-nowrap">Logout</span>

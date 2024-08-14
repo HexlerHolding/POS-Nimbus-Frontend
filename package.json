@@ -18,7 +18,8 @@
     "react-simple-maps": "^3.0.0",
     "redux": "^5.0.1",
     "swiper": "^11.1.9",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zustand": "^4.5.4"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -11,14 +11,39 @@ import ManagerManagement from "./ManagerManagement/page";
 import BranchPage from "./BranchManagement/ViewBranches";
 import ProductPage from "./Product/page";
 
+import AuthService from "../../Services/authService";
+import useStore from "../../Store/store";
+
+import { Modal } from "react-bootstrap";
+
 const DashboardLayout = () => {
   const [show, handleShow] = useState(false);
-
   const [showUser, handleShowUser] = useState(false);
-
   const [selected, setSelected] = useState("Dashboard");
+  const { userRole, setUserRole } = useStore();
 
-  return (
+  useEffect(() => {
+    console.log(userRole);
+    if (!userRole || userRole === "null" || userRole !== "admin") {
+      window.location.href = "/admin/login";
+    }
+  }, [userRole]);
+
+  const handleLogout = async () => {
+    try {
+      const response = await AuthService.logout();
+      console.log(response);
+      if (response.data.message) {
+        setUserRole(null);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return userRole !== "admin" ? (
+    <></>
+  ) : (
     <div className="">
       <div className="">
         <nav className="bg-white border-gray-200 dark:bg-gray-100">
@@ -279,9 +304,7 @@ const DashboardLayout = () => {
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                onClick={() => {
-                  window.location.href = "/admin/login";
-                }}
+                onClick={handleLogout}
               >
                 <BiLogOut className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
                 <span className="flex-1 ms-3 whitespace-nowrap">Logout</span>
