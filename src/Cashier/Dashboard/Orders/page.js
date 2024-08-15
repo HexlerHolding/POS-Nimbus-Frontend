@@ -120,12 +120,6 @@ const Orders = () => {
     }
   };
 
-  const grandTotal = (total, discount, tax) => {
-    let grandTotal = total - (total * discount) / 100;
-    grandTotal = grandTotal + (grandTotal * tax) / 100;
-    return grandTotal.toFixed(2);
-  };
-
   return (
     <div className="p-5">
       <div>
@@ -359,7 +353,7 @@ const Orders = () => {
               <div className="w-full border-t-2 flex items-center p-2">
                 <p className="text-md p-2">
                   Grand Total:{" "}
-                  {grandTotal(order.total, order.discount, order.tax)} /-
+                  {order.grand_total} /-
                 </p>
                 {order.status === "pending" && (
                   <button

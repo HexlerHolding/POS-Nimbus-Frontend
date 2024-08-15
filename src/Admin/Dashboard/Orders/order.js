@@ -435,21 +435,6 @@ const Order = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const grandTotal = (order) => {
-    if(!order) return 0;
-    var total = order.total;
-
-    if (order.discount > 0) {
-      total -= (total * order.discount) / 100;
-    }
-
-    if (order.tax > 0) {
-      total += (total * order.tax) / 100;
-    }
-
-    return total.toFixed(2);
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex items-center justify-between p-5 gap-5">
@@ -715,7 +700,7 @@ const Order = () => {
             </p>
           </div>
           <p className="mt-2 mb-2">
-            <strong>Grand Total:</strong> PKR {grandTotal(selectedOrder)} /-
+            <strong>Grand Total:</strong> PKR {selectedOrder?.grand_total} /-
           </p>
           <p className="mt-2 mb-2">
             <strong>Cart:</strong>

@@ -42,7 +42,7 @@ const Order = () => {
     setNumberOfOrders(orders.length);
     setTotalSales(
       orders.reduce((acc, order) => {
-        return acc + order.total;
+        return acc + order.grand_total;
       }, 0)
     );
     setSalesToday(
@@ -53,18 +53,18 @@ const Order = () => {
           );
         })
         .reduce((acc, order) => {
-          return acc + order.total;
+          return acc + order.grand_total;
         }, 0)
     );
     setAverageOrder(
       orders.reduce((acc, order) => {
-        return acc + order.total;
+        return acc + order.grand_total;
       }, 0) / orders.length
     );
     setHighestOrder(
       Math.max(
         ...orders.map((order) => {
-          return order.total;
+          return order.grand_total;
         })
       )
     );
@@ -113,7 +113,7 @@ const Order = () => {
     //group by date
     const groupedOrders = last7Days.reduce((acc, order) => {
       const date = order.time.split("T")[0];
-      acc[date] = acc[date] ? acc[date] + order.total : order.total;
+      acc[date] = acc[date] ? acc[date] + order.grand_total : order.grand_total;
 
       return acc;
     }, {});
@@ -153,19 +153,19 @@ const Order = () => {
       {
         type: "delivery",
         total: deliveryOrders.reduce((acc, order) => {
-          return acc + order.total;
+          return acc + order.grand_total;
         }, 0),
       },
       {
         type: "takeway",
         total: takeoutOrders.reduce((acc, order) => {
-          return acc + order.total;
+          return acc + order.grand_total;
         }, 0),
       },
       {
         type: "dine-in",
         total: dineInOrders.reduce((acc, order) => {
-          return acc + order.total;
+          return acc + order.grand_total;
         }, 0),
       },
     ];
@@ -224,7 +224,7 @@ const Order = () => {
       series: [
         {
           name: "Sales",
-          data: ordersInLast7Days2.map((order) => order.total),
+          data: ordersInLast7Days2.map((order) => order.grand_total),
 
           color: "#1A56DB",
         },
@@ -414,7 +414,7 @@ const Order = () => {
 
   const onClickDownloadOrdersData = () => {
     const csv = orders.map((order) => {
-      return `${order._id},${order.customer_name},${order.address},${order.total},${order.status},${order.payment_method},${order.order_type}`;
+      return `${order._id},${order.customer_name},${order.address},${order.total},${order.grand_total},${order.status},${order.payment_method},${order.order_type}`;
     });
 
     const csvData = csv.join("\n");
@@ -425,21 +425,6 @@ const Order = () => {
     a.download = "orders.csv";
     a.click();
     window.URL.revokeObjectURL(url);
-  };
-
-  const grandTotal = (order) => {
-    if (!order) return 0;
-    var total = order.total;
-
-    if (order.discount > 0) {
-      total -= (total * order.discount) / 100;
-    }
-
-    if (order.tax > 0) {
-      total += (total * order.tax) / 100;
-    }
-
-    return total.toFixed(2);
   };
 
   return (
@@ -543,7 +528,7 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Highest Order</p>
-            <p className="text-3xl text-black font-semibold">${highestOrder}</p>
+            <p className="text-3xl text-black font-semibold">{highestOrder}</p>
           </div>
         </div>
         <div
@@ -602,6 +587,9 @@ const Order = () => {
                 Total
               </th>
               <th scope="col" class="px-6 py-3">
+                Grand Total
+              </th>
+              <th scope="col" class="px-6 py-3">
                 Order Status
               </th>
               <th scope="col" class="px-6 py-3">
@@ -616,7 +604,7 @@ const Order = () => {
             {paginatedOrders.map((order) => (
               <tr
                 class="text-gray-700 dark:text-gray-400 cursor-pointer"
-                key={order.order_id}
+                key={order._id}
                 onClick={() => {
                   setSelectedOrder(order);
                   setShowModal(true);
@@ -635,6 +623,9 @@ const Order = () => {
                 </td>
                 <td class="px-6 py-4">
                   <p>{order.total}</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p>{order.grand_total}</p>
                 </td>
                 <td class="px-6 py-4">
                   <p>{order.status}</p>
@@ -691,7 +682,7 @@ const Order = () => {
           <div className="flex items-center justify-between mb-2 mt-2">
             <p>
               <strong>Order ID:</strong>{" "}
-              {selectedOrder ? commonService.handleID(selectedOrder._id) : ""}
+              {selectedOrder ? commonService.handleCode(selectedOrder._id) : ""}
             </p>
             <p>
               <strong>Customer Name:</strong> {selectedOrder?.customer_name}
@@ -730,7 +721,7 @@ const Order = () => {
             </p>
           </div>
           <p className="mt-2 mb-2">
-            <strong>Grand Total:</strong> PKR {grandTotal(selectedOrder)} /-
+            <strong>Grand Total:</strong> PKR {selectedOrder?.grand_total} /-
           </p>
           <p className="mt-2 mb-2">
             <strong>Cart:</strong>

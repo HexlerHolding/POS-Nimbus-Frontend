@@ -163,6 +163,7 @@ const Home = () => {
     const order = {
       products: cart.items,
       total: cart.total,
+      grand_total: await grandTotal(cart.total, details.discount, details.tax),
       customer_name: details.customerName,
       payment_method: details.payment_method,
       order_type: details.order_type,
@@ -255,18 +256,18 @@ const Home = () => {
     }
   }, []);
 
-  const grandTotal = (order) => {
-    var total = order.total;
+  const grandTotal = async (total, discount, tax) => {
+    let grandTotal = total;
 
-    if (order.discount > 0) {
-      total -= (total * order.discount) / 100;
+    if (discount > 0) {
+      grandTotal -= (grandTotal * discount) / 100;
     }
 
-    if (order.tax > 0) {
-      total += (total * order.tax) / 100;
+    if (tax > 0) {
+      grandTotal += (grandTotal * tax) / 100;
     }
 
-    return total.toFixed(2);
+    return grandTotal.toFixed(2);
   };
 
   return (
@@ -389,7 +390,7 @@ const Home = () => {
                     ))}
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <p>Total: PKR {grandTotal(order)}</p>
+                    <p>Total: PKR {order.grand_total}</p>
                     <button
                       className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm"
                       onClick={() => {
@@ -509,7 +510,7 @@ const Home = () => {
                   }
                 />
               </div>
-              <div className="mb-3 w-1/2">
+              {/* <div className="mb-3 w-1/2">
                 <label htmlFor="tax" className="form-label">
                   Tax
                 </label>
@@ -522,7 +523,7 @@ const Home = () => {
                     setDetails({ ...details, tax: e.target.value })
                   }
                 />
-              </div>
+              </div> */}
             </div>
 
             <div className="mb-3">
