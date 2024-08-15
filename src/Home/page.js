@@ -16,7 +16,7 @@ import AboutUs from "./aboutus";
 import Services from "./services";
 import HowItWorks from "./howItWorks";
 import Section from "./section";
-import animatedburger from "../Assets/animated.png";
+import animatedburger from "../Assets/borger.png";
 
 import c from "../Assets/c.png";
 import c1 from "../Assets/c1.png";
@@ -60,8 +60,21 @@ const data = [
 const Home = () => {
   return (
     <div>
-      <div className=" flex flex-row justify-between items-center bg-blue-900 p-20 pb-0 min-h-screen">
-        <div className="text-left p-10 w-1/2">
+      <div className="bg-white w-full flex justify-between items-center p-5">
+        <h2 className="text-2xl font-semibold text-gray-900">
+          Nimbus360 Solutions
+        </h2>
+        <div className="flex flex-row">
+          <button
+            className="bg-transparent text-gray-900 py-2 px-4 rounded-0 border border-gray-900 font-semibold hover:bg-gray-900 hover:text-white"
+            onClick={() => (window.location.href = "/login")}
+          >
+            Login
+          </button>
+        </div>
+      </div>
+      <div className=" flex flex-row justify-between items-center bg-blue-900 pb-0 min-h-screen">
+        <div className="text-left p-20 w-1/2">
           <h1 className="text-white text-5xl font-semibold mb-5">
             Nimbus<span className="text-green-400">360 </span>
             Solutions
@@ -91,6 +104,7 @@ const Home = () => {
           <img
             src={animatedburger}
             alt="animatedburger"
+            className="mb-5"
             style={{ width: "1200px", height: "650px" }}
           />
         </div>
@@ -118,14 +132,20 @@ const Home = () => {
           incorporate all key roles within your establishment.
         </p>
         <Swiper
-          modules={[Navigation, Pagination, Scrollbar, A11y, Controller, Autoplay]}
+          modules={[
+            Navigation,
+            Pagination,
+            Scrollbar,
+            A11y,
+            Controller,
+            Autoplay,
+          ]}
           spaceBetween={0}
           slidesPerView={1}
           pagination={{ clickable: true }}
           scrollbar={{ draggable: true }}
           onSwiper={(swiper) => console.log(swiper)}
-          autoplay={{ delay: 5000 }}
-          
+          autoplay={{ delay: 3000 }}
         >
           {data.map((item, index) => (
             <SwiperSlide key={index}>

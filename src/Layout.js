@@ -11,11 +11,13 @@ import ManagerDashboardLayout from "./Manager/DashboardLayout";
 import Orders from "./Kitchen/Orders/page";
 import CashierLogin from "./Cashier/Login/page";
 import ManagerLogin from "./Manager/Login/page";
+import Login from "./Login/login";
 
 const Layout = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/user/login" element={<UserLogin />} />
