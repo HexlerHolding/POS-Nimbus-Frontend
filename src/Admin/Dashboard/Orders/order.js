@@ -29,7 +29,7 @@ const Order = () => {
   });
 
   const salesToday = ordersToday.reduce((acc, order) => {
-    return acc + order.total;
+    return acc + order.grand_total;
   }, 0);
 
   const last30Days = orders.filter((order) => {
@@ -39,14 +39,14 @@ const Order = () => {
   });
 
   const salesLast30Days = last30Days.reduce((acc, order) => {
-    return acc + order.total;
+    return acc + order.grand_total;
   }, 0);
 
   const totalOrders = orders.length;
 
   const totalSales = orders.reduce(
     (acc, order) => {
-      return acc + order.total;
+      return acc + order.grand_total;
     },
 
     0
@@ -55,7 +55,7 @@ const Order = () => {
   const averageOrder = (totalSales / totalOrders).toFixed(2);
 
   const highestOrder = orders.reduce((acc, order) => {
-    return Math.max(acc, order.total);
+    return Math.max(acc, order.grand_total);
   }, 0);
 
   const numberOfRefunds = orders.filter((order) => {
@@ -266,9 +266,9 @@ const Order = () => {
       const index = categories.indexOf(date);
 
       if (order.payment_method === "cash") {
-        seriesData.Cash[index] += order.total;
+        seriesData.Cash[index] += order.grand_total;
       } else if (order.payment_method === "card") {
-        seriesData.Card[index] += order.total;
+        seriesData.Card[index] += order.grand_total;
       }
     });
 
@@ -421,11 +421,17 @@ const Order = () => {
   };
 
   const onClickDownloadOrdersData = () => {
+    const headers =
+      "Order ID,Customer Name,Address,Total,Grand Total,Status,Payment Method,Order Type";
     const csv = orders.map((order) => {
-      return `${order._id},${order.customer_name},${order.address},${order.total},${order.status},${order.payment_method},${order.order_type}`;
+      return `${commonService.handleCode(order._id)},${order.customer_name},${
+        order.address
+      },${order.total},${order.grand_total},${order.status},${
+        order.payment_method
+      },${order.order_type}`;
     });
 
-    const csvData = csv.join("\n");
+    const csvData = [headers, ...csv].join("\n");
     const blob = new Blob([csvData], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -572,6 +578,9 @@ const Order = () => {
                 Total
               </th>
               <th scope="col" class="px-6 py-3">
+                Grand Total
+              </th>
+              <th scope="col" class="px-6 py-3">
                 Order Status
               </th>
               <th scope="col" class="px-6 py-3">
@@ -605,6 +614,9 @@ const Order = () => {
                 </td>
                 <td class="px-6 py-4">
                   <p>{order.total}</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p>{order.grand_total.toFixed(2)}</p>
                 </td>
                 <td class="px-6 py-4">
                   <p>{order.status}</p>
@@ -661,7 +673,7 @@ const Order = () => {
           <div className="flex items-center justify-between mb-2 mt-2">
             <p>
               <strong>Order ID:</strong>{" "}
-              {selectedOrder ? commonService.handleID(selectedOrder._id) : ""}
+              {selectedOrder ? commonService.handleCode(selectedOrder._id) : ""}
             </p>
             <p>
               <strong>Customer Name:</strong> {selectedOrder?.customer_name}

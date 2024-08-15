@@ -413,11 +413,17 @@ const Order = () => {
   };
 
   const onClickDownloadOrdersData = () => {
+    const headers =
+      "Order ID,Customer Name,Address,Total,Grand Total,Status,Payment Method,Order Type";
     const csv = orders.map((order) => {
-      return `${order._id},${order.customer_name},${order.address},${order.total},${order.grand_total},${order.status},${order.payment_method},${order.order_type}`;
+      return `${commonService.handleCode(order._id)},${order.customer_name},${
+        order.address
+      },${order.total},${order.grand_total},${order.status},${
+        order.payment_method
+      },${order.order_type}`;
     });
 
-    const csvData = csv.join("\n");
+    const csvData = [headers, ...csv].join("\n");
     const blob = new Blob([csvData], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -528,7 +534,9 @@ const Order = () => {
         >
           <div>
             <p className="text-black text-md mb-0">Highest Order</p>
-            <p className="text-3xl text-black font-semibold">{highestOrder}</p>
+            <p className="text-3xl text-black font-semibold">
+              {highestOrder.toFixed(2)}
+            </p>
           </div>
         </div>
         <div
@@ -625,7 +633,7 @@ const Order = () => {
                   <p>{order.total}</p>
                 </td>
                 <td class="px-6 py-4">
-                  <p>{order.grand_total}</p>
+                  <p>{order.grand_total.toFixed(2)}</p>
                 </td>
                 <td class="px-6 py-4">
                   <p>{order.status}</p>

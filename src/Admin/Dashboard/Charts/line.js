@@ -29,7 +29,7 @@ const Line = ({}) => {
         new Date(order.time).getTime() >
         new Date().getTime() - 7 * 24 * 60 * 60 * 1000
       ) {
-        sales += order.total;
+        sales += order.grand_total;
         orders2.push(order);
       }
     });
@@ -154,9 +154,9 @@ const Line = ({}) => {
 
   const convertNumbertoK = (number) => {
     if (number > 999) {
-      return (number / 1000).toFixed(1) + "k";
+      return (number / 1000).toFixed(2) + "k";
     }
-    return number;
+    return number.toFixed(2);
   };
 
   const [percentageChangeFromLastDay, setPercentageChangeFromLastDay] =

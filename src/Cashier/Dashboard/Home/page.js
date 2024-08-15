@@ -20,7 +20,7 @@ const Home = () => {
   const [details, setDetails] = useState({
     customerName: "",
     discount: 0,
-    address: "",
+    address: "In Branch",
     order_type: "",
     tax: 0,
     payment_method: "",

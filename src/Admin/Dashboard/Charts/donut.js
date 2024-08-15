@@ -32,7 +32,7 @@ const Donut = () => {
   }, []);
 
   const convertToK = (value) => {
-    return value / 1000;
+    return (value / 1000).toFixed(3);
   };
 
   useEffect(() => {

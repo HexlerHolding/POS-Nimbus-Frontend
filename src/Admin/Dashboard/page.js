@@ -51,7 +51,7 @@ const Dashboard = () => {
         new Date().getTime() - 1 * 24 * 60 * 60 * 1000
       ) {
         count++;
-        sales += order.total;
+        sales += order.grand_total;
         orders2.push(order);
       }
     });
@@ -96,7 +96,7 @@ const Dashboard = () => {
                 Total Sales in Last 24 Hours
               </p>
               <p className="text-5xl text-white font-semibold ">
-                {salesInLast24Hours}
+                {salesInLast24Hours.toFixed(2)}
               </p>
             </div>
           </div>
