@@ -224,7 +224,7 @@ const Order = () => {
       series: [
         {
           name: "Sales",
-          data: ordersInLast7Days2.map((order) => order.grand_total),
+          data: ordersInLast7Days2.map((order) => order.total),
 
           color: "#1A56DB",
         },
