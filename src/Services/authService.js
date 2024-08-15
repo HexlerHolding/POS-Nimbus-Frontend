@@ -32,6 +32,31 @@ const AuthService = {
       return "error";
     }
   },
+  managerLogin: async (name, password, shopName, branch) => {
+    try {
+      console.log(name, password, shopName, branch);
+      const response = await axios.post(
+        `${BASE_URL}/auth/manager/login`,
+        {
+          username: name,
+          password,
+          shopName,
+          branchName: branch,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+      return handleResponse(response);
+    } catch (error) {
+      return "error";
+    }
+  },
   cashierLogin: async (name, password, shopName, branch) => {
     try {
       // console.log(name, password, shopName, branch);
@@ -57,17 +82,11 @@ const AuthService = {
       return "error";
     }
   },
-  managerLogin: async (name, password, shopName, branch) => {
+  logout: async () => {
     try {
-      console.log(name, password, shopName, branch);
       const response = await axios.post(
-        `${BASE_URL}/auth/manager/login`,
-        {
-          username: name,
-          password,
-          shopName,
-          branchName: branch,
-        },
+        `${BASE_URL}/auth/logout`,
+        {},
         {
           headers: {
             "Content-Type": "application/json",

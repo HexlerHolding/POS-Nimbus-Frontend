@@ -5,6 +5,7 @@ import { AiOutlineClockCircle } from "react-icons/ai";
 import Logo from "../../Assets/Logo.png";
 import Navbar from "../../Components/Navbar";
 import AuthService from "../../Services/authService";
+import useStore from "../../Store/store";
 
 const advantages = [
   {
@@ -32,6 +33,7 @@ const advantages = [
 const AdminLogin = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const { setUserRole } = useStore();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -42,6 +44,8 @@ const AdminLogin = () => {
       if (res === "error") {
         alert("Wrong Credentials");
       } else {
+        alert("Login Successful");
+        setUserRole(res.data.role);
         window.location.href = "/admin/dashboard";
       }
     });

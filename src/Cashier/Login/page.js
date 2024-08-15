@@ -5,6 +5,7 @@ import { AiOutlineClockCircle } from "react-icons/ai";
 import Logo from "../../Assets/Logo.png";
 import Navbar from "../../Components/Navbar";
 import AuthService from "../../Services/authService";
+import useStore from "../../Store/store";
 
 const advantages = [
   {
@@ -36,6 +37,7 @@ const CashierLogin = () => {
   const [branch, setBranch] = useState("");
   const [shopNames, setShopNames] = useState([]);
   const [shopName, setShopName] = useState("");
+  const { setUserRole } = useStore();
 
   useEffect(() => {
     AuthService.getShopNames().then((res) => {
@@ -71,6 +73,7 @@ const CashierLogin = () => {
         alert("Wrong Credentials");
       } else {
         alert("Login Successful");
+        setUserRole(res.data.role);
         window.location.href = "/cashier/dashboard";
       }
     });

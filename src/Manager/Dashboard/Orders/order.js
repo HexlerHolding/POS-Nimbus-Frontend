@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
-import orders from "./data.js";
 import ApexCharts from "apexcharts";
 import { BiDownload } from "react-icons/bi";
 import managerService from "../../../Services/managerService.js";
@@ -9,7 +8,7 @@ import commonService from "../../../Services/common.js";
 const Order = () => {
   const [loading, setLoading] = useState(true);
 
-  const [orders2, setOrders2] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [numberOfOrders, setNumberOfOrders] = useState(0);
   const [ordersInLast7Days, setOrdersInLast7Days] = useState(0);
   const [totalSales, setTotalSales] = useState(0);
@@ -25,29 +24,29 @@ const Order = () => {
       if (response == "error") {
         console.log("error");
       } else {
-        setOrders2(response.data.orders);
+        setOrders(response.data.orders);
         console.log(response.data);
       }
     });
   }, []);
 
   useEffect(() => {
-    if (orders2.length === 0) return;
-    const last7Days = orders2.filter((order) => {
+    if (orders.length === 0) return;
+    const last7Days = orders.filter((order) => {
       return (
         new Date(order.time) > new Date(new Date() - 7 * 24 * 60 * 60 * 1000) &&
         new Date(order.time) < new Date()
       );
     });
     setOrdersInLast7Days(last7Days.length);
-    setNumberOfOrders(orders2.length);
+    setNumberOfOrders(orders.length);
     setTotalSales(
-      orders2.reduce((acc, order) => {
+      orders.reduce((acc, order) => {
         return acc + order.total;
       }, 0)
     );
     setSalesToday(
-      orders2
+      orders
         .filter((order) => {
           return (
             order.time.split("T")[0] === new Date().toISOString().split("T")[0]
@@ -58,25 +57,25 @@ const Order = () => {
         }, 0)
     );
     setAverageOrder(
-      orders2.reduce((acc, order) => {
+      orders.reduce((acc, order) => {
         return acc + order.total;
-      }, 0) / orders2.length
+      }, 0) / orders.length
     );
     setHighestOrder(
       Math.max(
-        ...orders2.map((order) => {
+        ...orders.map((order) => {
           return order.total;
         })
       )
     );
     setActiveOrders(
-      orders2.filter((order) => {
+      orders.filter((order) => {
         return order.status === "pending" || order.status === "ready";
       }).length
     );
 
     setCompletedOrdersToday(
-      orders2.filter((order) => {
+      orders.filter((order) => {
         return (
           order.time.split("T")[0] === new Date().toISOString().split("T")[0] &&
           order.status === "completed"
@@ -84,7 +83,7 @@ const Order = () => {
       }).length
     );
     setLoading(false);
-  }, [orders2]);
+  }, [orders]);
 
   const [ordersInLast7Days2, setOrdersInLast7Days2] = useState([]);
   const [last7Dates, setLast7Dates] = useState([]);
@@ -104,8 +103,8 @@ const Order = () => {
   }, []);
 
   useEffect(() => {
-    if (orders2.length === 0) return;
-    const last7Days = orders2.filter((order) => {
+    if (orders.length === 0) return;
+    const last7Days = orders.filter((order) => {
       return (
         new Date(order.time) > new Date(new Date() - 7 * 24 * 60 * 60 * 1000) &&
         new Date(order.time) < new Date()
@@ -130,7 +129,7 @@ const Order = () => {
     console.log("order", ordersInLast7Days);
 
     setOrdersInLast7Days2(ordersInLast7Days);
-  }, [orders2]);
+  }, [orders]);
 
   const [ordersByType, setOrdersByType] = useState([
     { type: "", total: 0 },
@@ -139,15 +138,15 @@ const Order = () => {
   ]);
 
   useEffect(() => {
-    if (orders2.length === 0) return;
-    const deliveryOrders = orders2.filter((order) => {
+    if (orders.length === 0) return;
+    const deliveryOrders = orders.filter((order) => {
       return order.order_type === "delivery";
     });
 
-    const takeoutOrders = orders2.filter((order) => {
+    const takeoutOrders = orders.filter((order) => {
       return order.order_type === "takeaway";
     });
-    const dineInOrders = orders2.filter((order) => {
+    const dineInOrders = orders.filter((order) => {
       return order.order_type === "dine-in";
     });
     const ordersByType = [
@@ -172,7 +171,7 @@ const Order = () => {
     ];
 
     setOrdersByType(ordersByType);
-  }, [orders2]);
+  }, [orders]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -336,7 +335,7 @@ const Order = () => {
 
   //get top 3 products
   useEffect(() => {
-    const products = orders2.reduce((acc, order) => {
+    const products = orders.reduce((acc, order) => {
       order.cart.forEach((item) => {
         acc[item.product_name] = acc[item.product_name]
           ? acc[item.product_name] + item.quantity
@@ -352,7 +351,7 @@ const Order = () => {
     const top3 = sortedProducts.slice(0, 3);
     setTop3Products(top3);
     setProductQuantities(top3.map((product) => products[product]));
-  }, [orders2]);
+  }, [orders]);
 
   //show with a pie chart
   useEffect(() => {
@@ -397,13 +396,13 @@ const Order = () => {
     return () => {
       chart.destroy();
     };
-  }, [orders2, top3Products, productQuantities]);
+  }, [orders, top3Products, productQuantities]);
 
   // Pagination calculations
   const totalPages = Math.ceil(orders.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedOrders = orders2.slice(startIndex, endIndex);
+  const paginatedOrders = orders.slice(startIndex, endIndex);
 
   const handlePreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
@@ -414,7 +413,7 @@ const Order = () => {
   };
 
   const onClickDownloadOrdersData = () => {
-    const csv = orders2.map((order) => {
+    const csv = orders.map((order) => {
       return `${order._id},${order.customer_name},${order.address},${order.total},${order.status},${order.payment_method},${order.order_type}`;
     });
 
@@ -426,6 +425,21 @@ const Order = () => {
     a.download = "orders.csv";
     a.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  const grandTotal = (order) => {
+    if (!order) return 0;
+    var total = order.total;
+
+    if (order.discount > 0) {
+      total -= (total * order.discount) / 100;
+    }
+
+    if (order.tax > 0) {
+      total += (total * order.tax) / 100;
+    }
+
+    return total.toFixed(2);
   };
 
   return (
@@ -676,7 +690,8 @@ const Order = () => {
         <Modal.Body className="p-2">
           <div className="flex items-center justify-between mb-2 mt-2">
             <p>
-              <strong>Order ID:</strong> {selectedOrder?.order_id}
+              <strong>Order ID:</strong>{" "}
+              {selectedOrder ? commonService.handleID(selectedOrder._id) : ""}
             </p>
             <p>
               <strong>Customer Name:</strong> {selectedOrder?.customer_name}
@@ -703,11 +718,19 @@ const Order = () => {
               <strong>Time:</strong> {selectedOrder?.time}
             </p>
             <p>
-              <strong>Tax:</strong> {selectedOrder?.tax}
+              <strong>Discount:</strong> {selectedOrder?.discount}%
             </p>
           </div>
-          <p className="mb-2">
-            <strong>Total:</strong> PKR {selectedOrder?.total} /-
+          <div className="flex items-center justify-between mb-2 mt-2">
+            <p>
+              <strong>Total:</strong> PKR {selectedOrder?.total} /-
+            </p>
+            <p>
+              <strong>Tax:</strong> {selectedOrder?.tax}%
+            </p>
+          </div>
+          <p className="mt-2 mb-2">
+            <strong>Grand Total:</strong> PKR {grandTotal(selectedOrder)} /-
           </p>
           <p className="mt-2 mb-2">
             <strong>Cart:</strong>
