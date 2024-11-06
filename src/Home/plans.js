@@ -35,7 +35,7 @@ const Membership = () => {
               restrictions.
             </p>
             <div className="mt-5 text-gray-500">
-              <button className="text-md text-white bg-blue-500 py-3 px-36 mt-4 rounded-0 hover:bg-blue-700">
+              <button className="text-md text-white bg-blue-500 py-3 px-8 sm:px-12 md:px-24 lg:px-36 mt-4 rounded-0 hover:bg-blue-700">
                 SUBSCRIBE
               </button>
             </div>
