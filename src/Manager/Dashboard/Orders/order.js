@@ -6,8 +6,7 @@ import managerService from "../../../Services/managerService.js";
 import commonService from "../../../Services/common.js";
 
 const Order = () => {
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const [numberOfOrders, setNumberOfOrders] = useState(0);
   const [ordersInLast7Days, setOrdersInLast7Days] = useState(0);
@@ -28,9 +27,12 @@ const Order = () => {
         console.log(response.data);
       }
     });
+
+    setLoading(false);
   }, []);
 
   useEffect(() => {
+    // setLoading(false);
     if (orders.length === 0) return;
     const last7Days = orders.filter((order) => {
       return (
@@ -99,6 +101,7 @@ const Order = () => {
     });
     setLast7Dates(dates.reverse());
 
+    console.log(dates.reverse());
     console.log(last7Dates);
   }, []);
 

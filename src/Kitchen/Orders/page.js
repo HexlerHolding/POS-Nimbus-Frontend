@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BiSolidSleepy } from "react-icons/bi";
-import CashierService from "../../Services/cashierService";
+import KitchenService from "../../Services/kitchenService";
 import CommonService from "../../Services/common";
 
 const Orders = () => {
@@ -9,12 +9,13 @@ const Orders = () => {
   const [timeLeft, setTimeLeft] = useState([]);
 
   const fetchOrders = async () => {
-    const response = await CashierService.getPendingOrders();
+    const response = await KitchenService.getPendingOrders();
     if (response.data) {
-      setFilteredOrders(response.data);
+      console.log(response.data.orders);
+      setFilteredOrders(response.data.orders);
       const TimeNow = new Date().getTime();
       setTimeLeft(
-        response.data.map((order) => {
+        response.data.orders.map((order) => {
           const orderTime = new Date(order.time).getTime();
           return Math.floor((orderTime + 180000 - TimeNow) / 1000);
         })
@@ -55,7 +56,7 @@ const Orders = () => {
   //const remove order from filteredOrders and timeLeft
   const removeOrder = (index, orderId) => {
     try {
-      const res = CashierService.markOrderReady(orderId);
+      const res = KitchenService.markOrderReady(orderId);
       if (res.error) {
         console.error(res.error);
         return;
@@ -124,7 +125,7 @@ const Orders = () => {
               <div className="absolute bottom-0 justify-between border-t-2 flex items-center p-2 w-full">
                 <p className="text-xl p-2 font-light">
                   Grand Total:{" "}
-                  {(order.total + (order.total * 5) / 100).toFixed(2)}
+                  {(order.total + (order.total * order.tax) / 100).toFixed(2)}
                 </p>
                 <p
                   className={`text-2xl p-2 font-semibold ${getBackgroundColor(

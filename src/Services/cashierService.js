@@ -87,21 +87,6 @@ const cashierService = {
     }
   },
 
-  markOrderReady: async (orderId) => {
-    try {
-      const response = await axios.put(
-        `${BASE_URL}/cashier/order/${orderId}/ready`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
-      return handleResponse(response);
-    } catch (error) {
-      return { error: error.message };
-    }
-  },
-
   markOrderCancelled: async (orderId) => {
     try {
       const response = await axios.put(

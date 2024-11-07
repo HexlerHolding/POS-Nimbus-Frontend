@@ -3,7 +3,7 @@ import { BiSolidSleepy } from "react-icons/bi";
 import cashierService from "../../../Services/cashierService";
 import commonService from "../../../Services/common";
 const Orders = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [activeOption, setActiveOption] = useState("All Orders");
   const [filteredOrders, setFilteredOrders] = useState(data);

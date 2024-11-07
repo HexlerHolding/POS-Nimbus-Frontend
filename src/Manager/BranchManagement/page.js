@@ -10,7 +10,7 @@ import { Modal } from "react-bootstrap";
 const BranchManagement = () => {
   const [branch, setBranch] = useState({});
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [openBranchModal, setOpenBranchModal] = useState(false);
   const [closeBranchModal, setCloseBranchModal] = useState(false);
@@ -42,7 +42,7 @@ const BranchManagement = () => {
   const openBranch = async () => {
     await updateCashOnHand();
     setOpenBranchModal(false);
-    setLoading(true);
+    // setLoading(true);
     await managerService.openBranch();
     setBranch({ ...branch, shift_status: true });
     fetchData();
@@ -51,7 +51,7 @@ const BranchManagement = () => {
   const closeBranch = async () => {
     await updateCashOnHand();
     setCloseBranchModal(false);
-    setLoading(true);
+    // setLoading(true);
     await managerService.closeBranch();
     setBranch({ ...branch, shift_status: false });
     fetchData();

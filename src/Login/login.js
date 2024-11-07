@@ -26,7 +26,7 @@ const options = [
   {
     icon: <FaGulp size={50} />,
     label: "Kitchen Staff",
-    link: "/kitchenstaff/login",
+    link: "/kitchen/login",
   },
 ];
 

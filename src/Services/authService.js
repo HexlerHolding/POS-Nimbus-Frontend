@@ -82,6 +82,31 @@ const AuthService = {
       return "error";
     }
   },
+  kitchenLogin: async (name, password, shopName, branch) => {
+    try {
+      // console.log(name, password, shopName, branch);
+      const response = await axios.post(
+        `${BASE_URL}/auth/kitchen/login`,
+        {
+          username: name,
+          password,
+          shopName,
+          branchName: branch,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+      return handleResponse(response);
+    } catch (error) {
+      return "error";
+    }
+  },
   logout: async () => {
     try {
       const response = await axios.post(

@@ -24,7 +24,7 @@ const ManagerDashboardLayout = () => {
   useEffect(() => {
     console.log(userRole);
     if (userRole === "null" || userRole === null || userRole !== "manager") {
-      window.location.href = "/manager/login";
+      window.location.href = "/login";
     }
   }, [userRole]);
 

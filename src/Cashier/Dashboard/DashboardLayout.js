@@ -19,7 +19,7 @@ const CashierDashboardLayout = () => {
   useEffect(() => {
     console.log(userRole);
     if (userRole === "null" || userRole === null || userRole !== "cashier") {
-      window.location.href = "/cashier/login";
+      window.location.href = "/login";
     }
   }, [userRole]);
 
