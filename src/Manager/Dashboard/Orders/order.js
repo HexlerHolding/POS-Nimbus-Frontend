@@ -461,12 +461,10 @@ const Order = () => {
           </div>
         </div>
       ) : null}
-      <div className="flex items-center justify-between p-5 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 p-5">
         <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
+          className="relative p-5 rounded-lg shadow-md h-24 card"
+          style={{ background: "#ffffff" }}
         >
           <div>
             <p className="text-black text-md mb-0">Total Orders</p>
@@ -476,10 +474,8 @@ const Order = () => {
           </div>
         </div>
         <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
+          className="relative p-5 rounded-lg shadow-md h-24 card"
+          style={{ background: "#ffffff" }}
         >
           <div>
             <p className="text-black text-md mb-0">Orders in Last 7 Days</p>
@@ -489,10 +485,8 @@ const Order = () => {
           </div>
         </div>
         <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
+          className="relative p-5 rounded-lg shadow-md h-24 card"
+          style={{ background: "#ffffff" }}
         >
           <div>
             <p className="text-black text-md mb-0">Total Sales</p>
@@ -502,10 +496,8 @@ const Order = () => {
           </div>
         </div>
         <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
+          className="relative p-5 rounded-lg shadow-md h-24 card"
+          style={{ background: "#ffffff" }}
         >
           <div>
             <p className="text-black text-md mb-0">Sales Today</p>
@@ -514,13 +506,9 @@ const Order = () => {
             </p>
           </div>
         </div>
-      </div>
-      <div className="flex items-center justify-between p-5 gap-5">
         <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
+          className="relative p-5 rounded-lg shadow-md h-24 card"
+          style={{ background: "#ffffff" }}
         >
           <div>
             <p className="text-black text-md mb-0">Average Order</p>
@@ -530,10 +518,8 @@ const Order = () => {
           </div>
         </div>
         <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
+          className="relative p-5 rounded-lg shadow-md h-24 card"
+          style={{ background: "#ffffff" }}
         >
           <div>
             <p className="text-black text-md mb-0">Highest Order</p>
@@ -543,10 +529,8 @@ const Order = () => {
           </div>
         </div>
         <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
+          className="relative p-5 rounded-lg shadow-md h-24 card"
+          style={{ background: "#ffffff" }}
         >
           <div>
             <p className="text-black text-md mb-0">Active Orders</p>
@@ -554,10 +538,8 @@ const Order = () => {
           </div>
         </div>
         <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
+          className="relative p-5 rounded-lg shadow-md h-24 card"
+          style={{ background: "#ffffff" }}
         >
           <div>
             <p className="text-black text-md mb-0">Completed Orders Today</p>
@@ -567,13 +549,17 @@ const Order = () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-between p-5 gap-5 h-96">
-        <div id="donut-chart" className="w-1/4"></div>
-
-        <div id="pie-chart" className="w-1/4"></div>
-        <div id="area-chart" className="w-1/2"></div>
+      <div className="flex flex-col lg:flex-row items-center justify-between p-5 gap-5">
+        <div className="flex flex-col md:flex-row items-center justify-center md:justify-between w-full h-full lg:w-1/2 gap-5">
+          <div id="donut-chart" className="w-full md:w-1/2 h-1/2"></div>
+          <div id="pie-chart" className="w-full md:w-1/2 h-1/2"></div>
+        </div>
+        <div
+          id="area-chart"
+          className="w-full items-center justify-center lg:w-1/2"
+        ></div>
       </div>
-      <div class="relative overflow-x-auto shadow-md rounded-lg p-5">
+      <div class="flex flex-col shadow-md rounded-lg p-5">
         <div className="w-full justify-end flex">
           <button
             onClick={onClickDownloadOrdersData}
@@ -582,75 +568,77 @@ const Order = () => {
             <BiDownload className="mr-2" /> Download CSV
           </button>
         </div>
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" class="px-6 py-3">
-                Order ID
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Customer Name
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Address
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Total
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Grand Total
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Order Status
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Payment Method
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Order Type
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-            {paginatedOrders.map((order) => (
-              <tr
-                class="text-gray-700 dark:text-gray-400 cursor-pointer"
-                key={order._id}
-                onClick={() => {
-                  setSelectedOrder(order);
-                  setShowModal(true);
-                }}
-              >
-                <td class="px-6 py-4">
-                  <div class="flex items-center space-x-3">
-                    <p>{commonService.handleCode(order._id)}</p>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.customer_name}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.address}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.total}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.grand_total.toFixed(2)}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.status}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.payment_method}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.order_type}</p>
-                </td>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" class="px-6 py-3">
+                  Order ID
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Customer Name
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Address
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Total
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Grand Total
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Order Status
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Payment Method
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Order Type
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+              {paginatedOrders.map((order) => (
+                <tr
+                  class="text-gray-700 dark:text-gray-400 cursor-pointer"
+                  key={order._id}
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setShowModal(true);
+                  }}
+                >
+                  <td class="px-6 py-4">
+                    <div class="flex items-center space-x-3">
+                      <p>{commonService.handleCode(order._id)}</p>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <p>{order.customer_name}</p>
+                  </td>
+                  <td class="px-6 py-4">
+                    <p>{order.address}</p>
+                  </td>
+                  <td class="px-6 py-4">
+                    <p>{order.total}</p>
+                  </td>
+                  <td class="px-6 py-4">
+                    <p>{order.grand_total.toFixed(2)}</p>
+                  </td>
+                  <td class="px-6 py-4">
+                    <p>{order.status}</p>
+                  </td>
+                  <td class="px-6 py-4">
+                    <p>{order.payment_method}</p>
+                  </td>
+                  <td class="px-6 py-4">
+                    <p>{order.order_type}</p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <div className="flex justify-between mt-4">
           <button
             onClick={handlePreviousPage}
