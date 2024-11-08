@@ -9,24 +9,18 @@ import { Modal } from "react-bootstrap";
 
 const BranchManagement = () => {
   const [branch, setBranch] = useState({});
-
   const [loading, setLoading] = useState(false);
-
   const [openBranchModal, setOpenBranchModal] = useState(false);
   const [closeBranchModal, setCloseBranchModal] = useState(false);
-
   const [openingTimeModal, setOpeningTimeModal] = useState(false);
   const [closingTimeModal, setClosingTimeModal] = useState(false);
-
   const [cashInDrawerModal, setCashInDrawerModal] = useState(false);
-
   const [cashInDrawer, setCashInDrawer] = useState(0);
 
   const fetchData = async () => {
     const response = await managerService.getBranch();
     if (response && response.data) {
       setBranch(response.data);
-      console.log(response.data);
       setLoading(false);
     }
   };
@@ -34,6 +28,7 @@ const BranchManagement = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
   const updateCashOnHand = async () => {
     await managerService.updateCashOnHand(cashInDrawer);
     setCashInDrawerModal(false);
@@ -42,7 +37,6 @@ const BranchManagement = () => {
   const openBranch = async () => {
     await updateCashOnHand();
     setOpenBranchModal(false);
-    // setLoading(true);
     await managerService.openBranch();
     setBranch({ ...branch, shift_status: true });
     fetchData();
@@ -51,7 +45,6 @@ const BranchManagement = () => {
   const closeBranch = async () => {
     await updateCashOnHand();
     setCloseBranchModal(false);
-    // setLoading(true);
     await managerService.closeBranch();
     setBranch({ ...branch, shift_status: false });
     fetchData();
@@ -68,13 +61,13 @@ const BranchManagement = () => {
   };
 
   return (
-    <div className="w-full flex flex-col min-h-screen p-20">
-      {loading ? (
+    <div className="w-full flex flex-col min-h-screen p-4 md:p-8 lg:p-20">
+      {loading && (
         <div className="flex justify-center items-center fixed bg-white bg-opacity-50 top-0 left-0 w-full h-full z-50">
           <div role="status">
             <svg
               aria-hidden="true"
-              class="w-24 h-24 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+              className="w-16 md:w-20 lg:w-24 h-16 md:h-20 lg:h-24 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
               viewBox="0 0 100 101"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -88,20 +81,24 @@ const BranchManagement = () => {
                 fill="currentFill"
               />
             </svg>
-            <span class="sr-only">Loading...</span>
+            <span className="sr-only">Loading...</span>
           </div>
         </div>
-      ) : null}
-      <div className="flex flex-row justify-start items-center gap-5 mb-10">
-        <FcSettings className="text-3xl" />
-        <h1 className="text-3xl font-semibold text-gray-800">
+      )}
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-start items-center gap-3 sm:gap-5 mb-6 sm:mb-10">
+        <FcSettings className="text-2xl sm:text-3xl" />
+        <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800">
           Branch Management
         </h1>
       </div>
-      <div className="flex justify-end">
+
+      {/* Action Button */}
+      <div className="flex justify-end mb-4">
         {branch.shift_status ? (
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded-lg"
+            className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base"
             onClick={() => {
               setCashInDrawerModal(true);
               setCloseBranchModal(true);
@@ -111,7 +108,7 @@ const BranchManagement = () => {
           </button>
         ) : (
           <button
-            className="bg-green-500 text-white px-4 py-2 rounded-lg"
+            className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base"
             onClick={() => {
               setCashInDrawerModal(true);
               setOpenBranchModal(true);
@@ -121,41 +118,51 @@ const BranchManagement = () => {
           </button>
         )}
       </div>
-      <div className="table w-full mt-4 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
-        <div className="table-row-group text-sm">
-          <div className="table-row text-gray-200">
-            <div className="table-cell font-bold text-center">Branch Name</div>
-            <div className="table-cell font-bold text-center">
-              Branch Location
-            </div>
-            <div className="table-cell font-bold text-center">Branch Phone</div>
-            <div className="table-cell font-bold text-center">Day Number</div>
-            <div className="table-cell font-bold text-center">
-              Branch Shift Status
-            </div>
-            <div className="table-cell font-bold text-center">
-              Branch Cash on Hand
-            </div>
+
+      {/* Branch Info Table */}
+            <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-sm">
+          {/* Branch Name */}
+          <div className="text-center">
+            <div className="text-gray-200 font-bold">Branch Name</div>
+            <div className="text-gray-300">{branch.branch_name}</div>
           </div>
-          <div className=" mt-2"></div>
-          <div className="table-row text-gray-300">
-            <div className="table-cell text-center">{branch.branch_name}</div>
-            <div className="table-cell text-center">{branch.address}</div>
-            <div className="table-cell text-center">{branch.contact}</div>
-            <div className="table-cell text-center">{branch.day_number}</div>
-            <div className="table-cell text-center">
+          {/* Location */}
+          <div className="text-center">
+            <div className="text-gray-200 font-bold">Location</div>
+            <div className="text-gray-300">{branch.address}</div>
+          </div>
+          {/* Phone */}
+          <div className="text-center">
+            <div className="text-gray-200 font-bold">Phone</div>
+            <div className="text-gray-300">{branch.contact}</div>
+          </div>
+          {/* Day Number */}
+          <div className="text-center">
+            <div className="text-gray-200 font-bold">Day Number</div>
+            <div className="text-gray-300">{branch.day_number}</div>
+          </div>
+          {/* Status */}
+          <div className="text-center">
+            <div className="text-gray-200 font-bold">Status</div>
+            <div className="text-gray-300">
               {branch.shift_status ? "Open" : "Closed"}
             </div>
-            <div className="table-cell text-center">{branch.cash_on_hand}</div>
+          </div>
+          {/* Cash on Hand */}
+          <div className="text-center">
+            <div className="text-gray-200 font-bold">Cash on Hand</div>
+            <div className="text-gray-300">{branch.cash_on_hand}</div>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-center mt-10 gap-10">
-        <div className="border p-10 rounded-lg bg-white shadow-lg dark:bg-gray-800 w-1/2">
+      {/* Time Cards */}
+      <div className="flex flex-col md:flex-row justify-center mt-6 sm:mt-10 gap-4 md:gap-10">
+        <div className="border p-6 sm:p-10 rounded-lg bg-white shadow-lg dark:bg-gray-800 w-full md:w-1/2">
           <div className="flex justify-between items-center text-white">
-            <BsClock className="text-2xl" />
-            <h2 className="text-2xl text-white">Opening Hours</h2>
+            <BsClock className="text-xl sm:text-2xl" />
+            <h2 className="text-xl sm:text-2xl text-white">Opening Hours</h2>
             <button
               className="bg-transparent text-white rounded-lg"
               onClick={() => setOpeningTimeModal(true)}
@@ -163,14 +170,14 @@ const BranchManagement = () => {
               Edit
             </button>
           </div>
-          <div className="flex justify-center mt-5 text-white text-5xl">
+          <div className="flex justify-center mt-4 sm:mt-5 text-white text-3xl sm:text-5xl">
             <h3>{branch.opening_time}</h3>
           </div>
         </div>
-        <div className="border p-10 rounded-lg bg-white shadow-lg dark:bg-gray-800 w-1/2">
+        <div className="border p-6 sm:p-10 rounded-lg bg-white shadow-lg dark:bg-gray-800 w-full md:w-1/2">
           <div className="flex justify-between items-center text-white">
-            <BsClock className="text-2xl" />
-            <h2 className="text-2xl text-white">Closing Hours</h2>
+            <BsClock className="text-xl sm:text-2xl" />
+            <h2 className="text-xl sm:text-2xl text-white">Closing Hours</h2>
             <button
               className="bg-transparent text-white rounded-lg"
               onClick={() => setClosingTimeModal(true)}
@@ -178,56 +185,60 @@ const BranchManagement = () => {
               Edit
             </button>
           </div>
-          <div className="flex justify-center mt-5 text-white text-5xl">
+          <div className="flex justify-center mt-4 sm:mt-5 text-white text-3xl sm:text-5xl">
             <h3>{branch.closing_time}</h3>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-center mt-10 gap-10">
-        <div className="border p-10 rounded-lg bg-white shadow-lg dark:bg-gray-800 w-1/2">
-          <h2 className="text-2xl text-white">Total Tables</h2>
-          <div className="flex justify-between mt-5 text-white text-5xl">
+      {/* Status Cards */}
+      <div className="flex flex-col md:flex-row justify-center mt-6 sm:mt-10 gap-4 md:gap-10">
+        <div className="border p-6 sm:p-10 rounded-lg bg-white shadow-lg dark:bg-gray-800 w-full md:w-1/2">
+          <h2 className="text-xl sm:text-2xl text-white">Total Tables</h2>
+          <div className="flex justify-between mt-4 sm:mt-5 text-white text-3xl sm:text-5xl">
             <h3>{branch.total_tables}</h3>
-            <IoTodayOutline className="text-5xl" />
+            <IoTodayOutline className="text-3xl sm:text-5xl" />
           </div>
         </div>
-        <div className="border p-10 rounded-lg bg-white shadow-lg dark:bg-gray-800 w-1/2">
-          <h2 className="text-2xl text-white">Branch Status</h2>
-          <div className="flex justify-between mt-5 text-white text-5xl">
+        <div className="border p-6 sm:p-10 rounded-lg bg-white shadow-lg dark:bg-gray-800 w-full md:w-1/2">
+          <h2 className="text-xl sm:text-2xl text-white">Branch Status</h2>
+          <div className="flex justify-between mt-4 sm:mt-5 text-white text-3xl sm:text-5xl">
             <h3>{branch.shift_status ? "Open" : "Closed"}</h3>
             {branch.shift_status ? (
-              <BiDoorOpen className="text-5xl" />
+              <BiDoorOpen className="text-3xl sm:text-5xl" />
             ) : (
-              <BsDoorClosed className="text-5xl" />
+              <BsDoorClosed className="text-3xl sm:text-5xl" />
             )}
           </div>
         </div>
       </div>
-      {openBranchModal || closeBranchModal ? (
+
+      {/* Modals */}
+      {(openBranchModal || closeBranchModal) && (
         <div
           onClick={() => {
             setOpenBranchModal(false);
             setCloseBranchModal(false);
           }}
           className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-40"
-        ></div>
-      ) : null}
+        />
+      )}
 
-      {openingTimeModal || closingTimeModal ? (
+      {(openingTimeModal || closingTimeModal) && (
         <div
           onClick={() => {
             setOpeningTimeModal(false);
             setClosingTimeModal(false);
           }}
           className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-40"
-        ></div>
-      ) : null}
+        />
+      )}
+
       <Modal
         show={openBranchModal}
         onHide={() => setOpenBranchModal(false)}
         centered
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-1/3 shadow-xl z-50 bg-white p-5 modal modalbody pt-10 pb-10"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-11/12 sm:w-2/3 md:w-1/2 lg:w-1/3 shadow-xl z-50 bg-white p-4 sm:p-5"
       >
         <Modal.Header closeButton>
           <Modal.Title>Open Branch</Modal.Title>
@@ -238,7 +249,7 @@ const BranchManagement = () => {
         <Modal.Footer>
           <button
             onClick={openBranch}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg"
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
           >
             Open Branch
           </button>
@@ -249,7 +260,7 @@ const BranchManagement = () => {
         show={closeBranchModal}
         onHide={() => setCloseBranchModal(false)}
         centered
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-1/3 shadow-xl z-50 bg-white p-5 modal modalbody"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-11/12 sm:w-2/3 md:w-1/2 lg:w-1/3 shadow-xl z-50 bg-white p-4 sm:p-5"
       >
         <Modal.Header closeButton>
           <Modal.Title>Close Branch</Modal.Title>
@@ -260,7 +271,7 @@ const BranchManagement = () => {
         <Modal.Footer>
           <button
             onClick={closeBranch}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg"
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
           >
             Close Branch
           </button>
@@ -271,26 +282,26 @@ const BranchManagement = () => {
         show={openingTimeModal}
         onHide={() => setOpeningTimeModal(false)}
         centered
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-1/3 shadow-xl z-50 bg-white p-5 modal modalbody"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-11/12 sm:w-2/3 md:w-1/2 lg:w-1/3 shadow-xl z-50 bg-white p-4 sm:p-5"
       >
         <Modal.Header closeButton>
-          <Modal.Title className="text-center font-semibold">
+          <Modal.Title className="text-center text-base sm:text-lg font-semibold">
             Update {branch.branch_name} Opening Time
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="p-5 flex justify-center">
+        <Modal.Body className="p-3 sm:p-5 flex justify-center">
           <input
             type="time"
             name="opening_time"
             value={branch.opening_time}
             onChange={branchTimingsChanged}
-            className="border border-gray-300 rounded-lg p-2"
+            className="border border-gray-300 rounded-lg p-2 w-full sm:w-auto"
           />
         </Modal.Body>
         <Modal.Footer className="flex justify-center w-full">
           <button
             onClick={updateBranchTimings}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full mt-5 hover:bg-blue-600"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full mt-3 sm:mt-5 text-sm sm:text-base"
           >
             Save
           </button>
@@ -301,28 +312,28 @@ const BranchManagement = () => {
         show={closingTimeModal}
         onHide={() => setClosingTimeModal(false)}
         centered
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-1/3 shadow-xl z-50 bg-white p-5 modal modalbody"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-11/12 sm:w-2/3 md:w-1/2 lg:w-1/3 shadow-xl z-50 bg-white p-4 sm:p-5"
       >
         <Modal.Header closeButton>
-          <Modal.Title className="text-center font-semibold">
+          <Modal.Title className="text-center text-base sm:text-lg font-semibold">
             Update {branch.branch_name} Closing Time
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="p-5 flex justify-center">
-          <div>
+        <Modal.Body className="p-3 sm:p-5 flex justify-center">
+          <div className="w-full">
             <input
               type="time"
               name="closing_time"
               value={branch.closing_time}
               onChange={branchTimingsChanged}
-              className="border border-gray-300 rounded-lg p-2"
+              className="border border-gray-300 rounded-lg p-2 w-full sm:w-auto"
             />
           </div>
         </Modal.Body>
         <Modal.Footer className="flex justify-center w-full">
           <button
             onClick={updateBranchTimings}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full mt-5 hover:bg-blue-600"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full mt-3 sm:mt-5 text-sm sm:text-base"
           >
             Save
           </button>
@@ -333,28 +344,29 @@ const BranchManagement = () => {
         show={cashInDrawerModal}
         onHide={() => setCashInDrawerModal(false)}
         centered
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-1/3 shadow-xl z-50 bg-white p-5 modal modalbody"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-11/12 sm:w-2/3 md:w-1/2 lg:w-1/3 shadow-xl z-50 bg-white p-4 sm:p-5"
       >
         <Modal.Header closeButton>
-          <Modal.Title className="text-center font-semibold">
+          <Modal.Title className="text-center text-base sm:text-lg font-semibold">
             Update Cash in Drawer
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="p-5 flex justify-center">
-          <div>
+        <Modal.Body className="p-3 sm:p-5 flex justify-center">
+          <div className="w-full">
             <input
               type="number"
               name="cash_in_drawer"
               value={cashInDrawer}
               onChange={(e) => setCashInDrawer(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2"
+              className="border border-gray-300 rounded-lg p-2 w-full"
+              placeholder="Enter amount"
             />
           </div>
         </Modal.Body>
         <Modal.Footer className="flex justify-center w-full">
           <button
             onClick={() => setCashInDrawerModal(false)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg w-full mt-5 hover:bg-blue-600"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full mt-3 sm:mt-5 text-sm sm:text-base"
           >
             Save
           </button>

@@ -194,6 +194,16 @@ const Order = () => {
         toolbar: {
           show: false,
         },
+        responsive: [
+          {
+            breakpoint: 640, // Adjust for small screens
+            options: {
+              chart: {
+                height: "100%", // Set a fixed height for small screens
+              },
+            },
+          },
+        ],
       },
       tooltip: {
         enabled: true,
@@ -277,6 +287,7 @@ const Order = () => {
           show: true,
         },
       },
+      // maintainAspectRatio: false,
       dataLabels: {
         enabled: false,
       },
@@ -368,6 +379,20 @@ const Order = () => {
         toolbar: {
           show: true,
         },
+        height: "100%",
+        responsive: [
+          {
+            breakpoint: 640,
+            options: {
+              chart: {
+                height: "100%",
+              },
+              legend: {
+                position: "bottom",
+              },
+            },
+          },
+        ],
       },
       colors: ["#1A56DB", "#F87171", "#34D399", "#FBBF24", "#818CF8"],
       labels: top3Products,
@@ -384,7 +409,7 @@ const Order = () => {
           breakpoint: 480,
           options: {
             chart: {
-              width: 200,
+              width: "100%",
             },
             legend: {
               position: "bottom",
@@ -549,15 +574,17 @@ const Order = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row items-center justify-between p-5 gap-5">
-        <div className="flex flex-col md:flex-row items-center justify-center md:justify-between w-full h-full lg:w-1/2 gap-5">
-          <div id="donut-chart" className="w-full md:w-1/2 h-1/2"></div>
-          <div id="pie-chart" className="w-full md:w-1/2 h-1/2"></div>
+      <div className="flex flex-col lg:flex-row items-center justify-between p-5 gap-5 w-full h-full max-h-256">
+        <div className="flex flex-col justify-center items-center sm:flex-row sm:justify-between w-full max-h-128 lg:w-1/2 gap-5">
+          <div id="donut-chart" className="w-full sm:w-1/2 sm:h-64"></div>
+          <div id="pie-chart" className="w-full sm:w-1/2 sm:h-64"></div>{" "}
         </div>
-        <div
-          id="area-chart"
-          className="w-full items-center justify-center lg:w-1/2"
-        ></div>
+        <div className="w-full lg:w-1/2 items-center justify-center">
+          <div
+            id="area-chart"
+            className="h-64 items-center justify-center w-full"
+          ></div>
+        </div>
       </div>
       <div class="flex flex-col shadow-md rounded-lg p-5">
         <div className="w-full justify-end flex">

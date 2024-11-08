@@ -1,33 +1,32 @@
 import React, { useState, useEffect } from "react";
-import CashierViews from "./cashierView";
-import managerService from "../../Services/managerService";
+import ViewKitchenStaffs from "./viewKitchen";
+import managerService from "../../../Services/managerService";
 
-const CashierManagement = () => {
+const KitchenManagement = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    managerService.addCashier(username, password).then((res) => {
+    managerService.addKitchenStaff(username, password).then((res) => {
       console.log(res);
       if (res === "error") {
         alert("Error adding cashier");
       } else {
-        alert("Cashier Added Successfully");
+        alert("Kitchen Staff Added Successfully");
         setUsername("");
         setPassword("");
         console.log(res);
-        
       }
     });
   };
 
   return (
-    <div className="text-center flex flex-col lg:flex-row justify-center min-h-screen">
-      <div className="m-10 p-10 lg:w-1/2">
-        <h1 className="text-2xl text-blue-500 mb-3">Add Cashier</h1>
+    <div className="text-center flex justify-center min-h-screen md:flex-row flex-col">
+      <div className="m-10 p-10 md:w-1/2">
+        <h1 className="text-2xl text-blue-500 mb-3">Add Kitchen Staff</h1>
         <p class="text-gray-500 dark:text-gray-400 mb-10">
-          Add a new cashier to the system
+          Add a new kitchen staff to the system
         </p>
         <div className="flex flex-col justify-center gap-10">
           <div className="flex flex-col w-full">
@@ -54,15 +53,15 @@ const CashierManagement = () => {
             className="bg-blue-500 text-white p-2 rounded-xl"
             onClick={handleSubmit}
           >
-            Add Cashier
+            Add Kitchen Staff
           </button>
         </div>
       </div>
       <div>
-        <CashierViews className="lg:w-1/2" />
+        <ViewKitchenStaffs className="md:w-1/2" />
       </div>
     </div>
   );
 };
 
-export default CashierManagement;
+export default KitchenManagement;

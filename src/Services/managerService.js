@@ -86,6 +86,35 @@ const managerService = {
     }
   },
 
+  getKitchenStaff: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/manager/kitchens`, {
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  addKitchenStaff: async (username, password) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/manager/kitchen/add`,
+        {
+          username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return "error";
+    }
+  },
+
   getBranch: async () => {
     try {
       const response = await axios.get(`${BASE_URL}/manager/`, {
