@@ -9,22 +9,22 @@ import { FaUserTie } from "react-icons/fa";
 
 const options = [
   {
-    icon: <HiUser size={50} />,
+    icon: <HiUser size={50} color="#4084f4" />,
     label: "Admin",
     link: "/admin/login",
   },
   {
-    icon: <FaUserTie size={50} />,
+    icon: <FaUserTie size={50} color="#4084f4" />,
     label: "Manager",
     link: "/manager/login",
   },
   {
-    icon: <HiOutlineShoppingCart size={50} />,
+    icon: <HiOutlineShoppingCart size={50} color="#4084f4" />,
     label: "Cashier",
     link: "/cashier/login",
   },
   {
-    icon: <FaGulp size={50} />,
+    icon: <FaGulp size={50} color="#4084f4" />,
     label: "Kitchen Staff",
     link: "/kitchen/login",
   },
@@ -83,8 +83,8 @@ const Login = () => {
             {options.map((option, index) => (
               <button
                 key={index}
-                className="text-black bg-blue-200 py-4 px-4 rounded-lg border-none 
-                          hover:bg-blue-300 hover:transform hover:scale-105 transition duration-400
+                className="text-black bg-blue-100 py-4 px-4 rounded-lg border-none 
+                          hover:bg-blue-200 hover:transform hover:scale-105 transition duration-400
                           flex flex-col justify-center items-center
                           h-40 sm:h-48"
                 onClick={() => (window.location.href = option.link)}

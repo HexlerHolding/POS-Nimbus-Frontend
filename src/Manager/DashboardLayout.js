@@ -5,6 +5,7 @@ import { HiUserGroup } from "react-icons/hi";
 import { AiOutlineBranches } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 import { GiBranchArrow } from "react-icons/gi";
+import { FaBars } from "react-icons/fa"; // Import the hamburger icon
 
 import CashierManagement from "./Dashboard/cashierAddtion";
 import CashierViews from "./Dashboard/cashierView";
@@ -41,136 +42,115 @@ const ManagerDashboardLayout = () => {
     }
   };
 
-  return userRole !== "manager" ? (
-    <></>
-  ) : (
-    <div className="">
-      <div className="">
-        <nav className="bg-white border-gray-200 dark:bg-gray-100">
-          <div className=" flex flex-wrap items-center justify-between p-4">
+  return userRole !== "manager" ? null : (
+    <div>
+      <nav className="bg-white border-gray-200 dark:bg-gray-100">
+        <div className="flex items-center justify-between p-4">
+          {/* Left Section: Hamburger Menu and Logo */}
+          <div className="flex items-center">
+            {/* Hamburger Menu */}
+            <button
+              type="button"
+              className="text-gray-500 hover:text-gray-700 focus:outline-none mr-3"
+              onClick={() => handleShow(!show)}
+            >
+              <FaBars className="h-6 w-6" />
+            </button>
+            {/* Nimbus Logo */}
             <a className="flex items-center space-x-3 rtl:space-x-reverse">
-              <img src={Logo} className="h-8" alt="Flowbite Logo" />
+              <img src={Logo} className="h-8" alt="Nimbus360 Logo" />
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-gray-800">
                 Nimbus<span className="text-blue-500">360</span>
               </span>
             </a>
-            <div className="flex gap-5">
-              <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                <button
-                  type="button"
-                  className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                  id="user-menu-button"
-                  aria-expanded="false"
-                  data-dropdown-toggle="user-dropdown"
-                  data-dropdown-placement="bottom"
-                  onClick={() => handleShowUser(!showUser)}
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    className="w-8 h-8 rounded-full"
-                    src={pfp2}
-                    alt="user photo"
-                  />
-                </button>
-
-                <div
-                  className={`absolute right-10 top-4 z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 ${
-                    showUser ? "block" : "hidden"
-                  }`}
-                  id="user-dropdown"
-                >
-                  <div className="px-4 py-3">
-                    <span className="block text-sm text-gray-900 dark:text-white">
-                      Bonnie Green
-                    </span>
-                    <span className="block text-sm  text-gray-500 truncate dark:text-gray-400">
-                      name@flowbite.com
-                    </span>
-                  </div>
-                  <ul className="py-2" aria-labelledby="user-menu-button">
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Dashboard
-                      </a>
-                    </li>
-
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Settings
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Earnings
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      >
-                        Sign out
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          </div>
+          {/* Right Section: User Profile */}
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+              onClick={() => handleShowUser(!showUser)}
+            >
+              <span className="sr-only">Open user menu</span>
+              <img
+                className="w-8 h-8 rounded-full"
+                src={pfp2}
+                alt="User photo"
+              />
+            </button>
+            {/* User Dropdown */}
+            {showUser && (
               <div
-                className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
-                id="navbar-user"
+                className="absolute right-10 top-14 z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
               >
-                <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                <div className="px-4 py-3">
+                  <span className="block text-sm text-gray-900 dark:text-white">
+                    Bonnie Green
+                  </span>
+                  <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
+                    name@flowbite.com
+                  </span>
+                </div>
+                <ul className="py-2">
                   <li>
                     <a
-                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 cursor-pointer"
-                      type="button"
-                      data-drawer-target="drawer-navigation"
-                      data-drawer-show="drawer-navigation"
-                      aria-controls="drawer-navigation"
-                      onClick={() => handleShow(!show)}
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                     >
-                      Menu
+                      Dashboard
+                    </a>
+                  </li>
+                  {/* Additional user menu items */}
+                  <li>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    >
+                      Settings
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    >
+                      Earnings
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                      onClick={handleLogout}
+                    >
+                      Sign out
                     </a>
                   </li>
                 </ul>
               </div>
-            </div>
+            )}
           </div>
-          {selected === "Add Cashier" && <CashierManagement />}
-          {selected === "View Cashier" && <CashierViews />}
-          {selected === "Orders" && <Orders />}
-          {selected === "Products" && <ProductPage />}
-          {selected === "Dashboard" && <Order />}
-          {selected === "Branches" && <BranchManagement />}
-          {selected === "Manage Kitchens" && <KitchenManagement />}
-        </nav>
-      </div>
+        </div>
+        {/* Render the selected page */}
+        {selected === "Add Cashier" && <CashierManagement />}
+        {selected === "View Cashier" && <CashierViews />}
+        {selected === "Orders" && <Orders />}
+        {selected === "Products" && <ProductPage />}
+        {selected === "Dashboard" && <Order />}
+        {selected === "Branches" && <BranchManagement />}
+        {selected === "Manage Kitchens" && <KitchenManagement />}
+      </nav>
+      {/* Sidebar Menu */}
       <div
         id="drawer-navigation"
-        className="fixed z-50 top-0 left-0 w-64 h-screen p-4 overflow-y-auto transition-transform -translate-x-full shadow-2xl border-r-4 border-gray-600"
-        tabIndex="-1"
-        aria-labelledby="drawer-navigation-label"
-        data-drawer="drawer-navigation"
-        data-drawer-hide="drawer-navigation"
-        data-drawer-hide-on-click="false"
-        data-drawer-hide-on-esc="false"
-        style={{
-          transform: show ? "translateX(0)" : "translate(-100%)",
-          backgroundColor: "#2638FF",
-        }}
+        className={`fixed z-50 top-0 left-0 w-64 h-screen p-4 overflow-y-auto transition-transform ${
+          show ? "translate-x-0" : "-translate-x-full"
+        } shadow-2xl border-r-4 border-gray-600`}
+        style={{ backgroundColor: "#2638FF" }}
       >
         <h5
           id="drawer-navigation-label"
-          className="text-base font-semibold text-white uppercase dark:text-white"
+          className="text-base font-semibold text-white uppercase"
         >
           Menu
         </h5>
@@ -180,16 +160,13 @@ const ManagerDashboardLayout = () => {
         <button
           onClick={() => handleShow(!show)}
           type="button"
-          data-drawer-hide="drawer-navigation"
-          aria-controls="drawer-navigation"
-          className="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 end-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+          className="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5"
         >
           <svg
             aria-hidden="true"
             className="w-5 h-5"
             fill="currentColor"
             viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               fillRule="evenodd"

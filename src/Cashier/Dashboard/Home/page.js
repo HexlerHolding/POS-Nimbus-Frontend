@@ -271,8 +271,8 @@ const Home = () => {
   };
 
   return (
-    <div className="home flex">
-      <div className="p-10 bg-white w-2/3">
+    <div className="home flex flex-col md:flex-row">
+      <div className="p-10 bg-white w-full md:w-1/2 lg:w-2/3">
         <h1 className="text-xl text-blue-500">Products</h1>
         <input
           type="text"
@@ -280,7 +280,7 @@ const Home = () => {
           className="border p-2 rounded w-full mt-3 mb-3"
           onChange={(e) => setFilter(e.target.value)}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {filteredProducts.map((product) => (
             <div
               key={product._id}
@@ -298,61 +298,67 @@ const Home = () => {
           ))}
         </div>
       </div>
-      <div className="p-10 bg-white w-1/3 cart fixed right-0 top-0 h-screen border-l overflow-y-auto">
-        <div className="flex justify-between items-center mb-10">
-          <h1 className="text-xl text-blue-500 mb-3">Cart</h1>
-          <button
-            className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
-            onClick={() => dispatch(clearCart())}
-          >
-            Clear Cart
-          </button>
-        </div>
-        <div className="overflow-y-auto h-72">
-          {cart.items.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full">
-              <BsCart className="text-6xl text-gray-300" />
-              <h3 className="text-center">Cart is empty</h3>
-            </div>
-          )}
-
-          {cart.items.map((item) => (
-            <div
-              key={item._id}
-              className="border p-4 flex items-center justify-between text-center rounded-lg h-20"
+      <div className="flex flex-col sm:flex-row md:flex-col p-10 bg-white w-full md:w-1/2 lg:w-1/3 cart md:fixed md:right-0 md:top-0 md:h-screen border-l overflow-y-auto">
+        <div className="border-t p-4 md:border-none md:p-0 w-full">
+          <div className="flex justify-between items-center mb-10">
+            <h1 className="text-xl text-blue-500 mb-3">Cart</h1>
+            <button
+              className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
+              onClick={() => dispatch(clearCart())}
             >
-              <h3 className="text-gray-700">{item.name}</h3>
-              <p>PKR {item.price}/-</p>
-              <p className="flex items-center justify-center">
-                <BiMinus
-                  className="cursor-pointer mr-2"
-                  onClick={() => handleUpdateQuantity(item, item.quantity - 1)}
-                />
-                {item.quantity}
-                <BiPlus
-                  className="cursor-pointer ml-2"
-                  onClick={() => handleUpdateQuantity(item, item.quantity + 1)}
-                />
-              </p>
-            </div>
-          ))}
+              Clear Cart
+            </button>
+          </div>
+          <div className="overflow-y-auto h-72">
+            {cart.items.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full">
+                <BsCart className="text-6xl text-gray-300" />
+                <h3 className="text-center">Cart is empty</h3>
+              </div>
+            )}
+
+            {cart.items.map((item) => (
+              <div
+                key={item._id}
+                className="border p-4 flex items-center justify-between text-center rounded-lg h-20"
+              >
+                <h3 className="text-gray-700">{item.name}</h3>
+                <p>PKR {item.price}/-</p>
+                <p className="flex items-center justify-center">
+                  <BiMinus
+                    className="cursor-pointer mr-2"
+                    onClick={() =>
+                      handleUpdateQuantity(item, item.quantity - 1)
+                    }
+                  />
+                  {item.quantity}
+                  <BiPlus
+                    className="cursor-pointer ml-2"
+                    onClick={() =>
+                      handleUpdateQuantity(item, item.quantity + 1)
+                    }
+                  />
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="border-t p-4 flex justify-between items-center">
+            <p className="text-gray-700">Total: PKR {cart.total}/-</p>
+            <button
+              className="bg-green-500 text-white p-2 rounded hover:bg-green-700"
+              onClick={() => {
+                if (cart.items.length === 0) {
+                  alert("Cart is empty");
+                  return;
+                }
+                setShowDetailsForm(true);
+              }}
+            >
+              Checkout
+            </button>
+          </div>
         </div>
-        <div className="border-t p-4 flex justify-between items-center">
-          <p className="text-gray-700">Total: PKR {cart.total}/-</p>
-          <button
-            className="bg-green-500 text-white p-2 rounded hover:bg-green-700"
-            onClick={() => {
-              if (cart.items.length === 0) {
-                alert("Cart is empty");
-                return;
-              }
-              setShowDetailsForm(true);
-            }}
-          >
-            Checkout
-          </button>
-        </div>
-        <div className="border-t p-4">
+        <div className="border-t p-4 w-full">
           <div className="flex justify-between">
             <h3 className="text-xl text-blue-500">Active Orders</h3>
             <h3 className="">
@@ -360,12 +366,12 @@ const Home = () => {
               <span className="text-blue-700">Order(s)</span>
             </h3>
           </div>
-          <div className="overflow-y-auto h-72 no-scrollbar flex flex-col justify-between">
+          <div className="overflow-y-auto h-96 md:h-72 no-scrollbar flex flex-col justify-between">
             {activeOrders &&
               activeOrders.map((order) => (
                 <div
                   key={order._id}
-                  className="relative border-2 border-dashed p-4 flex flex-col text-center rounded-lg mt-10 me-4"
+                  className="relative border-2 border-dashed p-4 flex flex-col text-center rounded-lg mt-10"
                 >
                   <div
                     className={`absolute top-2 right-2 w-4 h-4 rounded-full ${

@@ -126,8 +126,8 @@ const Orders = () => {
         <h1 className="text-2xl text-blue-500 mb-2">Orders</h1>
         <div className="gap-5">
           <h1 className="text-xl text-gray-500 mb-2">Filters</h1>
-          <div className="flex gap-5">
-            <div className="relative z-0 mb-5 group w-1/3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:gap-5">
+            <div className="relative z-0 mb-5 group ">
               <input
                 type="text"
                 name="order_id"
@@ -143,7 +143,7 @@ const Orders = () => {
                 Order ID
               </label>
             </div>
-            <div className="relative z-0 mb-5 group w-1/3">
+            <div className="relative z-0 mb-5 group">
               <input
                 type="text"
                 name="customer_name"
@@ -159,7 +159,7 @@ const Orders = () => {
                 Customer Name
               </label>
             </div>
-            <div className="relative z-0 mb-5 group w-1/3">
+            <div className="relative z-0 mb-5 group">
               <input
                 type="text"
                 name="time"
@@ -175,9 +175,7 @@ const Orders = () => {
                 Time
               </label>
             </div>
-          </div>
-          <div className="flex gap-5">
-            <div className="relative z-0 mb-5 group w-1/3">
+            <div className="relative z-0 mb-5 group">
               <input
                 type="text"
                 name="total"
@@ -193,7 +191,7 @@ const Orders = () => {
                 Total
               </label>
             </div>
-            <div className="relative z-0 mb-5 group w-1/3">
+            <div className="relative z-0 mb-5 group">
               <select
                 name="payment_method"
                 id="payment_method"
@@ -214,7 +212,7 @@ const Orders = () => {
                 Payment Method
               </label>
             </div>
-            <div className="relative z-0 mb-5 group w-1/3">
+            <div className="relative z-0 mb-5 group">
               <select
                 name="status"
                 id="status"
@@ -251,7 +249,7 @@ const Orders = () => {
             Search
           </button>
         </div>
-        <div className="flex gap-5">
+        <div className="flex gap-5 overflow-x-auto">
           <button
             className={`${
               activeOption === "All Orders" ? "bg-green-500" : "bg-gray-800"

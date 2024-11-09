@@ -72,61 +72,59 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col">
-        <div className="flex items-center justify-between p-5 gap-5">
-          <div
-            className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between"
-            style={{ background: "#2c302c" }}
-          >
-            <div>
-              <p className="text-white text-lg mb-3">
-                Total Orders in Last 24 Hours
-              </p>
-              <p className="text-5xl text-white font-semibold">
-                {numberOfOrdersInLast24Hours}
-              </p>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 p-5 w-full justify-between">
+        <div
+          className="relative flex p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between"
+          style={{ background: "#2c302c" }}
+        >
+          <div>
+            <p className="text-white text-lg mb-3">
+              Total Orders in Last 24 Hours
+            </p>
+            <p className="text-5xl text-white font-semibold">
+              {numberOfOrdersInLast24Hours}
+            </p>
           </div>
-          <div
-            className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between card"
-            style={{ background: "#383F51" }}
-          >
-            <div>
-              <p className="text-white text-lg mb-3">
-                Total Sales in Last 24 Hours
-              </p>
-              <p className="text-5xl text-white font-semibold ">
-                {salesInLast24Hours.toFixed(2)}
-              </p>
-            </div>
+        </div>
+        <div
+          className="relative flex p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between card"
+          style={{ background: "#383F51" }}
+        >
+          <div>
+            <p className="text-white text-lg mb-3">
+              Total Sales in Last 24 Hours
+            </p>
+            <p className="text-5xl text-white font-semibold ">
+              {salesInLast24Hours.toFixed(2)}
+            </p>
           </div>
+        </div>
 
-          <div
-            className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between card"
-            style={{ background: "#368F8B" }}
-          >
-            <div>
-              <p className="text-white text-lg mb-3">Number of Branches</p>
-              <p className="text-5xl text-white font-semibold">
-                {numberOfBranches}
-              </p>
-            </div>
+        <div
+          className="relative flex p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between card"
+          style={{ background: "#368F8B" }}
+        >
+          <div>
+            <p className="text-white text-lg mb-3">Number of Branches</p>
+            <p className="text-5xl text-white font-semibold">
+              {numberOfBranches}
+            </p>
           </div>
-          <div
-            className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between card"
-            style={{ background: "#1f2937" }}
-          >
-            <div>
-              <p className="text-white text-lg mb-3">Products In Store</p>
-              <p className="text-5xl text-white font-semibold">
-                {numberOfProducts}
-              </p>
-            </div>
+        </div>
+        <div
+          className="relative flex p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between card"
+          style={{ background: "#1f2937" }}
+        >
+          <div>
+            <p className="text-white text-lg mb-3">Products In Store</p>
+            <p className="text-5xl text-white font-semibold">
+              {numberOfProducts}
+            </p>
           </div>
         </div>
       </div>
-      <div className="flex flex-row gap-5 p-5 w-full justify-between">
-        <Line/>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 p-5 w-full justify-between">
+        <Line />
         <Chart />
         <ExpenseChart />
         <Donut />

@@ -24,7 +24,7 @@ const CashierManagement = () => {
 
   return (
     <div className="text-center flex flex-col lg:flex-row justify-center min-h-screen">
-      <div className="m-10 p-10 lg:w-1/2">
+      <div className="m-10 p-5 sm:p-10 lg:w-1/2">
         <h1 className="text-2xl text-blue-500 mb-3">Add Cashier</h1>
         <p class="text-gray-500 dark:text-gray-400 mb-10">
           Add a new cashier to the system
@@ -58,8 +58,8 @@ const CashierManagement = () => {
           </button>
         </div>
       </div>
-      <div>
-        <CashierViews className="lg:w-1/2" />
+      <div className="lg:w-1/2 w-full">
+        <CashierViews className="w-full" />
       </div>
     </div>
   );

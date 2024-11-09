@@ -172,7 +172,7 @@ const Line = ({}) => {
   }, [last7Days]);
 
   return (
-    <div className="w-1/4 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 h-96">
+    <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 h-96">
       <div className="flex justify-between">
         <div>
           <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">

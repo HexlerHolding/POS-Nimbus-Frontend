@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 // import Managers from "./data";
 import AdminService from "../../../Services/adminService";
+import commonService from "../../../Services/common";
 
 const ManagerView = () => {
   const [branches, setBranches] = useState([]);
@@ -17,20 +18,24 @@ const ManagerView = () => {
 
   useEffect(() => {
     AdminService.getManagers().then((res) => {
-      console.log(res.data);
+      // console.log(res.data);
+      // console.log("selected branch", selectedBranch);
 
       if (selectedBranch === "all") {
         setSelectedManagers(res.data);
       } else {
-        setSelectedManagers(
-          res.data.filter((manager) => manager.branch_name === selectedBranch)
+        // console.log("selected branch", selectedBranch);
+        let manager = res.data.filter(
+          (manager) => manager.branch_id._id == selectedBranch
         );
+        // console.log("manager", manager);
+        setSelectedManagers(manager);
       }
     });
   }, [selectedBranch]);
 
   return (
-    <div class="relative overflow-x-auto p-20 min-h-screen">
+    <div class="relative overflow-x-auto p-10 sm:p-20 min-h-screen">
       <h1 class="text-2xl text-blue-500 mb-2">View Managers</h1>
       <p class="text-gray-500 dark:text-gray-400 mb-10">
         View all managers in a branch
@@ -57,50 +62,52 @@ const ManagerView = () => {
         </label>
       </div>
 
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" class="px-6 py-3">
-              Manager ID
-            </th>
-            <th scope="col" class="px-6 py-3">
-              Manager Name
-            </th>
-            <th scope="col" class="px-6 py-3">
-              Branch Name
-            </th>
-            <th scope="col" class="px-6 py-3">
-              Username
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {selectedManagers.map((manager) => (
-            <tr class="bg-white dark:bg-gray-800" key={manager._id}>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900 dark:text-gray-400">
-                      {manager._id}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" class="px-6 py-3">
+                Manager ID
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Manager Name
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Branch Name
+              </th>
+              <th scope="col" class="px-6 py-3">
+                Username
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedManagers.map((manager) => (
+              <tr class="bg-white dark:bg-gray-800" key={manager._id}>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900 dark:text-gray-400">
+                        {commonService.handleID(manager._id)}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-gray-200">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900 dark:text-gray-200">
+                    {manager.username}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  {manager.branch_id.branch_name}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   {manager.username}
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {manager.branch_id.branch_name}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {manager.username}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

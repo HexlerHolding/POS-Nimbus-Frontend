@@ -146,7 +146,7 @@ const Donut = () => {
   };
 
   return (
-    <div class="w-1/4 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 h-96">
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 h-96">
       <div class="flex justify-between mb-10">
         <div class="flex justify-center items-center ">
           <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1 ">
@@ -247,7 +247,7 @@ const Donut = () => {
         </div>
       </div>
 
-      <div  id="donut-chart" className="h-96"></div>
+      <div  id="donut-chart" className="h-96 lg:h-64"></div>
     </div>
   );
 };

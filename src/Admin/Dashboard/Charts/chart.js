@@ -171,7 +171,7 @@ const Chart = () => {
   }, []);
 
   return (
-    <div className="w-1/4 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 h-96 flex flex-col">
+    <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 h-96 flex flex-col">
       <div className="flex justify-start items-start">
         <h5 className="text-xl font-bold leading-none text-gray-100 pe-1 mb-5">
           Order progress

@@ -63,7 +63,7 @@ const AddProduct = () => {
   }, []);
 
   return (
-    <form className="p-20 min-h-screen">
+    <form className="p-10 sm:p-20 min-h-screen">
       <h1 className="text-2xl text-blue-500 mb-2">Add Product</h1>
       <p className="text-gray-500 dark:text-gray-400 mb-4">
         Fill in the details to add a new product

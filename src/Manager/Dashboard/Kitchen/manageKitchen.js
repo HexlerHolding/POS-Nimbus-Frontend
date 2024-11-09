@@ -22,8 +22,8 @@ const KitchenManagement = () => {
   };
 
   return (
-    <div className="text-center flex justify-center min-h-screen md:flex-row flex-col">
-      <div className="m-10 p-10 md:w-1/2">
+    <div className="text-center flex justify-center min-h-screen lg:flex-row flex-col">
+      <div className="m-10 p-5 sm:p-10 lg:w-1/2">
         <h1 className="text-2xl text-blue-500 mb-3">Add Kitchen Staff</h1>
         <p class="text-gray-500 dark:text-gray-400 mb-10">
           Add a new kitchen staff to the system
@@ -57,8 +57,8 @@ const KitchenManagement = () => {
           </button>
         </div>
       </div>
-      <div>
-        <ViewKitchenStaffs className="md:w-1/2" />
+      <div className="w-full lg:w-1/2">
+        <ViewKitchenStaffs className="w-full" />
       </div>
     </div>
   );

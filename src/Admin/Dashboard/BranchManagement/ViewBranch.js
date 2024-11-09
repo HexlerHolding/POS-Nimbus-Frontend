@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 const ViewBranches = ({ branches }) => {
   //table for displaying branches
   return (
-    <div class="relative overflow-x-auto p-20 min-h-screen">
+    <div class="relative overflow-x-auto p-10 sm:p-20 min-h-screen">
       <h1 class="text-2xl text-blue-500 mb-2">View Branches</h1>
       <p class="text-gray-500 dark:text-gray-400 mb-10">View all branches</p>
-      <div class="relative z-0 w-full mb-10 group mt-2">
+      <div class="relative z-0 w-full mb-10 group mt-2 overflow-x-auto">
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
             <tr>
@@ -38,7 +38,7 @@ const ViewBranches = ({ branches }) => {
           </thead>
           <tbody>
             {branches.map((branch) => (
-              <tr class="bg-gray-50 dark:bg-gray-700 text-black dark:text-gray-200">
+              <tr class="bg-gray-50 dark:bg-gray-800 text-black dark:text-gray-200">
                 <td class="px-6 py-4">{branch.branch_name}</td>
                 <td class="px-6 py-4">{branch.address}</td>
                 <td class="px-6 py-4">{branch.contact}</td>

@@ -574,8 +574,8 @@ const Order = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row items-center justify-between p-5 gap-5 w-full h-full max-h-256">
-        <div className="flex flex-col justify-center items-center sm:flex-row sm:justify-between w-full max-h-128 lg:w-1/2 gap-5">
+      <div className="flex flex-col lg:flex-row sm:items-center sm:justify-between p-5 gap-5 w-full max-h-256">
+        <div className="flex flex-col justify-between sm:items-center sm:flex-row sm:justify-between w-full h-196 lg:w-1/2 gap-5">
           <div id="donut-chart" className="w-full sm:w-1/2 sm:h-64"></div>
           <div id="pie-chart" className="w-full sm:w-1/2 sm:h-64"></div>{" "}
         </div>

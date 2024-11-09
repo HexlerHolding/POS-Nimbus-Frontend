@@ -368,6 +368,7 @@ const Order = () => {
     }
     const options = {
       chart: {
+        height: "100%",
         type: "pie",
         fontFamily: "Inter, sans-serif",
         toolbar: {
@@ -384,19 +385,7 @@ const Order = () => {
         },
       },
       series: productQuantities,
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200,
-            },
-            legend: {
-              position: "bottom",
-            },
-          },
-        },
-      ],
+
     };
     const chart = new ApexCharts(document.getElementById("pie-chart"), options);
     chart.render();
@@ -443,234 +432,220 @@ const Order = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="flex items-center justify-between p-5 gap-5">
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Total Orders</p>
-            <p className="text-3xl text-black font-semibold">{totalOrders}</p>
+      {/* Stats Grid - First Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex flex-col">
+            <p className="text-black text-sm lg:text-md mb-1">Total Orders</p>
+            <p className="text-xl lg:text-3xl text-black font-semibold">
+              {totalOrders}
+            </p>
           </div>
         </div>
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Total Sales</p>
-            <p className="text-3xl text-black font-semibold">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex flex-col">
+            <p className="text-black text-sm lg:text-md mb-1">Total Sales</p>
+            <p className="text-xl lg:text-3xl text-black font-semibold">
               {totalSales.toFixed(2)}
             </p>
           </div>
         </div>
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Sales Today</p>
-            <p className="text-3xl text-black font-semibold">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex flex-col">
+            <p className="text-black text-sm lg:text-md mb-1">Sales Today</p>
+            <p className="text-xl lg:text-3xl text-black font-semibold">
               {salesToday.toFixed(2)}
             </p>
           </div>
         </div>
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Sales Last 30 Days</p>
-            <p className="text-3xl text-black font-semibold">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex flex-col">
+            <p className="text-black text-sm lg:text-md mb-1">
+              Sales Last 30 Days
+            </p>
+            <p className="text-xl lg:text-3xl text-black font-semibold">
               {salesLast30Days.toFixed(2)}
             </p>
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between p-5 gap-5">
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Average Order</p>
-            <p className="text-3xl text-black font-semibold">{averageOrder}</p>
+
+      {/* Stats Grid - Second Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex flex-col">
+            <p className="text-black text-sm lg:text-md mb-1">Average Order</p>
+            <p className="text-xl lg:text-3xl text-black font-semibold">
+              {averageOrder}
+            </p>
           </div>
         </div>
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Highest Order</p>
-            <p className="text-3xl text-black font-semibold">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex flex-col">
+            <p className="text-black text-sm lg:text-md mb-1">Highest Order</p>
+            <p className="text-xl lg:text-3xl text-black font-semibold">
               {highestOrder.toFixed(2)}
             </p>
           </div>
         </div>
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Number of Refunds</p>
-            <p className="text-3xl text-black font-semibold">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex flex-col">
+            <p className="text-black text-sm lg:text-md mb-1">
+              Number of Refunds
+            </p>
+            <p className="text-xl lg:text-3xl text-black font-semibold">
               {numberOfRefunds}
             </p>
           </div>
         </div>
-        <div
-          className="relative flex w-1/4 p-5 rounded-lg shadow-md items-center gap-5 h-24 justify-between card"
-          style={{
-            background: "#ffffff",
-          }}
-        >
-          <div>
-            <p className="text-black text-md mb-0">Total Tax Collected</p>
-            <p className="text-3xl text-black font-semibold">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex flex-col">
+            <p className="text-black text-sm lg:text-md mb-1">
+              Total Tax Collected
+            </p>
+            <p className="text-xl lg:text-3xl text-black font-semibold">
               {totalTax.toFixed(2)}
             </p>
           </div>
         </div>
       </div>
-      <div className="flex justify-between p-5 gap-5 h-96">
-        <div id="area-chart" className="w-1/4"></div>
-        <div id="donut-chart" className="w-1/4"></div>
-        <div id="bar-chart" className="w-1/4"></div>
-        <div id="pie-chart" className="w-1/4"></div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 h-[64rem]">
+        <div >
+          <div id="area-chart" className="w-full h-64 "></div>
+        </div>
+        <div>
+          <div id="donut-chart" className="w-full h-64 "></div>
+        </div>
+        <div>
+          <div id="bar-chart" className="w-full h-64 "></div>
+        </div>
+        <div>
+          <div id="pie-chart" className="w-full h-64 "></div>
+        </div>
       </div>
-      <div class="relative overflow-x-auto shadow-md rounded-lg p-5">
-        <div className="w-full justify-end flex">
+
+      {/* Table Section */}
+      <div className="relative overflow-x-auto shadow-md rounded-lg p-4">
+        <div className="w-full flex justify-end mb-4">
           <button
             onClick={onClickDownloadOrdersData}
-            className=" text-black flex items-center focus:outline-none mb-2 mr-2"
+            className="text-black flex items-center focus:outline-none"
           >
             <BiDownload className="mr-2" /> Download CSV
           </button>
         </div>
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" class="px-6 py-3">
-                Order ID
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Customer Name
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Address
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Total
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Grand Total
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Order Status
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Payment Method
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Order Type
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-            {paginatedOrders.map((order) => (
-              <tr
-                class="text-gray-700 dark:text-gray-400 cursor-pointer"
-                key={order.order_id}
-                onClick={() => {
-                  setSelectedOrder(order);
-                  setShowModal(true);
-                }}
-              >
-                <td class="px-6 py-4">
-                  <div class="flex items-center space-x-3">
-                    <p>{commonService.handleCode(order._id)}</p>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.customer_name}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.address}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.total}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.grand_total.toFixed(2)}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.status}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.payment_method}</p>
-                </td>
-                <td class="px-6 py-4">
-                  <p>{order.order_type}</p>
-                </td>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th scope="col" className="px-4 py-3">
+                  Order ID
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Customer Name
+                </th>
+                <th scope="col" className="px-4 py-3 hidden md:table-cell">
+                  Address
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Total
+                </th>
+                <th scope="col" className="px-4 py-3 hidden sm:table-cell">
+                  Grand Total
+                </th>
+                <th scope="col" className="px-4 py-3 hidden lg:table-cell">
+                  Status
+                </th>
+                <th scope="col" className="px-4 py-3 hidden lg:table-cell">
+                  Payment
+                </th>
+                <th scope="col" className="px-4 py-3 hidden lg:table-cell">
+                  Type
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="flex justify-between mt-4">
+            </thead>
+            <tbody className="bg-white divide-y">
+              {paginatedOrders.map((order) => (
+                <tr
+                  key={order.order_id}
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setShowModal(true);
+                  }}
+                  className="hover:bg-gray-50 cursor-pointer"
+                >
+                  <td className="px-4 py-3">
+                    {commonService.handleCode(order._id)}
+                  </td>
+                  <td className="px-4 py-3">{order.customer_name}</td>
+                  <td className="px-4 py-3 hidden md:table-cell">
+                    {order.address}
+                  </td>
+                  <td className="px-4 py-3">{order.total}</td>
+                  <td className="px-4 py-3 hidden sm:table-cell">
+                    {order.grand_total.toFixed(2)}
+                  </td>
+                  <td className="px-4 py-3 hidden lg:table-cell">
+                    {order.status}
+                  </td>
+                  <td className="px-4 py-3 hidden lg:table-cell">
+                    {order.payment_method}
+                  </td>
+                  <td className="px-4 py-3 hidden lg:table-cell">
+                    {order.order_type}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex flex-row sm:flex-row justify-between items-center mt-4 gap-4">
           <button
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
+            className="w-1/4 sm:w-auto px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
           >
             Previous
           </button>
-          <div>
+          <div className="text-sm">
             Page {currentPage} of {totalPages}
           </div>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
+            className="w-1/4 sm:w-auto px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
           >
             Next
           </button>
         </div>
       </div>
-      {
-        //overlay modal
-        showModal && (
-          <div
-            className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50"
-            onClick={() => setShowModal(false)}
-          ></div>
-        )
-      }
+
+      {/* Modal Overlay */}
+      {showModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40"
+          onClick={() => setShowModal(false)}
+        />
+      )}
+
+      {/* Order Details Modal */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
-        centered
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none rounded-2xl w-1/2 shadow-xl z-50 bg-white p-5 modal modalbody"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full sm:w-4/5 lg:w-2/3 max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-xl z-50 p-4"
       >
-        <Modal.Header closeButton className="border-b-2">
-          <Modal.Title>Order Details</Modal.Title>
+        <Modal.Header closeButton className="border-b pb-4">
+          <Modal.Title className="text-lg font-semibold">
+            Order Details
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="p-2">
-          <div className="flex items-center justify-between mb-2 mt-2">
+        <Modal.Body className="py-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <p>
               <strong>Order ID:</strong>{" "}
               {selectedOrder ? commonService.handleCode(selectedOrder._id) : ""}
@@ -678,85 +653,61 @@ const Order = () => {
             <p>
               <strong>Customer Name:</strong> {selectedOrder?.customer_name}
             </p>
-          </div>
-          <div className="flex items-center justify-between mb-2 mt-2">
             <p>
               <strong>Order Type:</strong> {selectedOrder?.order_type}
             </p>
             <p>
               <strong>Order Status:</strong> {selectedOrder?.status}
             </p>
-          </div>
-          <div className="flex items-center justify-between mb-2 mt-2">
             <p>
               <strong>Payment Method:</strong> {selectedOrder?.payment_method}
             </p>
             <p>
               <strong>Address:</strong> {selectedOrder?.address}
             </p>
-          </div>
-          <div className="flex items-center justify-between mb-2 mt-2">
             <p>
               <strong>Time:</strong> {selectedOrder?.time}
             </p>
             <p>
               <strong>Discount:</strong> {selectedOrder?.discount}%
             </p>
-          </div>
-          <div className="flex items-center justify-between mb-2 mt-2">
             <p>
               <strong>Total:</strong> PKR {selectedOrder?.total} /-
             </p>
             <p>
               <strong>Tax:</strong> {selectedOrder?.tax}%
             </p>
+            <p className="sm:col-span-2">
+              <strong>Grand Total:</strong> PKR {selectedOrder?.grand_total} /-
+            </p>
           </div>
-          <p className="mt-2 mb-2">
-            <strong>Grand Total:</strong> PKR {selectedOrder?.grand_total} /-
-          </p>
-          <p className="mt-2 mb-2">
-            <strong>Cart:</strong>
-          </p>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Product Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Quantity
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Price
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-              {selectedOrder?.cart.map((item) => (
-                <tr
-                  className="text-gray-700 dark:text-gray-400"
-                  key={item.product_name}
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center space-x-3">
-                      <p>{item.product_name}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p>{item.quantity}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p>{item.price}</p>
-                  </td>
+
+          <p className="font-semibold mb-2">Cart Items:</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left">Product Name</th>
+                  <th className="px-4 py-2 text-left">Quantity</th>
+                  <th className="px-4 py-2 text-left">Price</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y">
+                {selectedOrder?.cart.map((item) => (
+                  <tr key={item.product_name}>
+                    <td className="px-4 py-2">{item.product_name}</td>
+                    <td className="px-4 py-2">{item.quantity}</td>
+                    <td className="px-4 py-2">{item.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Modal.Body>
-        <Modal.Footer className="border-t-2 p-2">
+        <Modal.Footer className="border-t pt-4">
           <button
             onClick={() => setShowModal(false)}
-            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded w-full"
+            className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
           >
             Close
           </button>
