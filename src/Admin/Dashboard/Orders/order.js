@@ -511,7 +511,7 @@ const Order = () => {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 h-[64rem]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 h-[64rem] lg:max-h-[16rem]">
         <div >
           <div id="area-chart" className="w-full h-64 "></div>
         </div>
