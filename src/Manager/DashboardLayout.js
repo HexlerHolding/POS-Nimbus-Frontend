@@ -146,7 +146,7 @@ const ManagerDashboardLayout = () => {
         className={`fixed z-50 top-0 left-0 w-64 h-screen p-4 overflow-y-auto transition-transform ${
           show ? "translate-x-0" : "-translate-x-full"
         } shadow-2xl border-r-4 border-gray-600`}
-        style={{ backgroundColor: "#2638FF" }}
+        style={{ backgroundColor: "#3a6ddf" }}
       >
         <h5
           id="drawer-navigation-label"
