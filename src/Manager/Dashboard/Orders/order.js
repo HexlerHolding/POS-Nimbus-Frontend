@@ -1,9 +1,9 @@
+import ApexCharts from "apexcharts";
 import React, { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
-import ApexCharts from "apexcharts";
 import { BiDownload } from "react-icons/bi";
-import managerService from "../../../Services/managerService.js";
 import commonService from "../../../Services/common.js";
+import managerService from "../../../Services/managerService.js";
 
 const Order = () => {
   const [loading, setLoading] = useState(false);
@@ -180,6 +180,24 @@ const Order = () => {
   const [itemsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const formatDateTime = (timeString) => {
+    if (!timeString) return "";
+
+    const date = new Date(timeString);
+
+    // Format date as YYYY-MM-DD
+    const dateStr = date.toISOString().split("T")[0];
+
+    // Get hours, minutes and seconds
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+
+    // Format with units
+    const timeStr = `${hours} hrs ${minutes} min ${seconds} sec`;
+
+    return `${dateStr} ${timeStr}`;
+  };
 
   //chart data for order trends
   useEffect(() => {
@@ -623,6 +641,9 @@ const Order = () => {
                 <th scope="col" class="px-6 py-3">
                   Order Type
                 </th>
+                <th scope="col" class="px-6 py-3">
+                  Date & Time
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -660,6 +681,9 @@ const Order = () => {
                   </td>
                   <td class="px-6 py-4">
                     <p>{order.order_type}</p>
+                  </td>
+                  <td class="px-6 py-4">
+                    <p>{formatDateTime(order.time)}</p>
                   </td>
                 </tr>
               ))}
@@ -732,7 +756,8 @@ const Order = () => {
           </div>
           <div className="flex items-center justify-between mb-2 mt-2">
             <p>
-              <strong>Time:</strong> {selectedOrder?.time}
+              <strong>Time:</strong>{" "}
+              {selectedOrder ? formatDateTime(selectedOrder.time) : ""}
             </p>
             <p>
               <strong>Discount:</strong> {selectedOrder?.discount}%

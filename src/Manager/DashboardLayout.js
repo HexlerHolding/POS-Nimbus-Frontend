@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import Logo from "../Assets/LogoWhite.png";
-import pfp2 from "../Assets/pfp2.jpeg";
-import { HiUserGroup } from "react-icons/hi";
+import React, { useEffect, useState } from "react";
 import { AiOutlineBranches } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
-import { GiBranchArrow } from "react-icons/gi";
 import { FaBars } from "react-icons/fa"; // Import the hamburger icon
+import { GiBranchArrow } from "react-icons/gi";
+import { HiUserGroup } from "react-icons/hi";
+import Logo from "../Assets/LogoWhite.png";
+import pfp2 from "../Assets/pfp2.jpeg";
 
+import AuthService from "../Services/authService";
+import useStore from "../Store/store";
+import BranchManagement from "./BranchManagement/page";
 import CashierManagement from "./Dashboard/cashierAddtion";
 import CashierViews from "./Dashboard/cashierView";
 import KitchenManagement from "./Dashboard/Kitchen/manageKitchen";
-import ProductPage from "./Dashboard/Product/page";
-import Orders from "./Dashboard/OrdersShow/page";
 import Order from "./Dashboard/Orders/order";
-import BranchManagement from "./BranchManagement/page";
-import AuthService from "../Services/authService";
-import useStore from "../Store/store";
+import Orders from "./Dashboard/OrdersShow/page";
+import ProductPage from "./Dashboard/Product/page";
 
 const ManagerDashboardLayout = () => {
   const [show, handleShow] = useState(false);
@@ -135,6 +135,8 @@ const ManagerDashboardLayout = () => {
         {selected === "Add Cashier" && <CashierManagement />}
         {selected === "View Cashier" && <CashierViews />}
         {selected === "Orders" && <Orders />}
+
+
         {selected === "Products" && <ProductPage />}
         {selected === "Dashboard" && <Order />}
         {selected === "Branches" && <BranchManagement />}
@@ -297,7 +299,9 @@ const ManagerDashboardLayout = () => {
                 >
                   <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
                 </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
+                <span className="flex-1 ms-3 whitespace-nowrap">Products
+                  
+                </span>
               </a>
             </li>
             <li>

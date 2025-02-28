@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BiSolidSleepy } from "react-icons/bi";
 import cashierService from "../../../Services/cashierService";
 import commonService from "../../../Services/common";
@@ -31,6 +31,22 @@ const Orders = () => {
   const [total, setTotal] = useState("");
   const [payment_method, setPayment_method] = useState("");
   const [status, setstatus] = useState("");
+  const formatDateTime = (timeString) => {
+    if (!timeString) return "";
+    
+    // Extract time components directly from the string to avoid time zone conversion
+    const timePart = timeString.split("T")[1]; // Gets the time part (e.g., "14:00:00Z")
+    const timeParts = timePart.split("Z")[0].split(":"); // Gets ["14", "00", "00"]
+    
+    const hours = parseInt(timeParts[0], 10);
+    const minutes = parseInt(timeParts[1], 10);
+    const seconds = parseInt(timeParts[2], 10);
+    
+    // Format with units
+    const timeStr = `${hours} hrs ${minutes} min ${seconds} sec`;
+    
+    return timeStr;
+  };
 
   const getOrders = async () => {
     const response = await cashierService.getOrders();
@@ -334,8 +350,8 @@ const Orders = () => {
                 Order Date: {order.time.split("T")[0]}
               </p>
               <p className="text-md mb-10">
-                Order Time: {order.time.split("T")[1].split("Z")[0]}
-              </p>
+  Order Time: {formatDateTime(order.time)}
+</p>
               <div className="w-full border-t-2 flex items-center p-2">
                 <div>
                   <p className="text-md">Total Amount: {order.total} /-</p>
