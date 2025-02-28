@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { AiOutlineClockCircle } from "react-icons/ai";
 import { BiWorld } from "react-icons/bi";
 import { FaChartLine } from "react-icons/fa";
-import { AiOutlineClockCircle } from "react-icons/ai";
 import Navbar from "../../Components/Navbar";
 import AuthService from "../../Services/authService";
 import useStore from "../../Store/store";
@@ -40,18 +40,32 @@ const ManagerLogin = () => {
   const { setUserRole } = useStore();
 
   useEffect(() => {
-    AuthService.getShopNames().then((res) => {
-      setShopNames(res);
-      console.log("ShopNames", shopNames);
-    });
+    AuthService.getShopNames()
+      .then((res) => {
+        // Ensure shopNames is always an array
+        const shops = Array.isArray(res) ? res : res.data ? res.data : [];
+        setShopNames(shops);
+        console.log("ShopNames", shops);
+      })
+      .catch(error => {
+        console.error("Error fetching shop names:", error);
+        setShopNames([]);
+      });
   }, []);
 
   const getBranches = () => {
-    AuthService.getBranches(shopName).then((res) => {
-      console.log("ShopName", shopName);
-      console.log(res);
-      setBranches(res);
-    });
+    AuthService.getBranches(shopName)
+      .then((res) => {
+        console.log("ShopName", shopName);
+        console.log(res);
+        // Ensure branches is always an array
+        const branchList = Array.isArray(res) ? res : res.data ? res.data : [];
+        setBranches(branchList);
+      })
+      .catch(error => {
+        console.error("Error fetching branches:", error);
+        setBranches([]);
+      });
   };
 
   useEffect(() => {
@@ -67,16 +81,21 @@ const ManagerLogin = () => {
     e.preventDefault();
     console.log(name, password, shopName, branch);
 
-    AuthService.managerLogin(name, password, shopName, branch).then((res) => {
-      console.log(res);
-      if (res === "error") {
-        alert("Wrong Credentials");
-      } else {
-        alert("Login Successful");
-        setUserRole(res.data.role);
-        window.location.href = "/manager/dashboard";
-      }
-    });
+    AuthService.managerLogin(name, password, shopName, branch)
+      .then((res) => {
+        console.log(res);
+        if (res === "error") {
+          alert("Wrong Credentials");
+        } else {
+          alert("Login Successful");
+          setUserRole(res.data.role);
+          window.location.href = "/manager/dashboard";
+        }
+      })
+      .catch(error => {
+        console.error("Login error:", error);
+        alert("Login failed. Please try again.");
+      });
   };
 
   return (
@@ -136,11 +155,15 @@ const ManagerLogin = () => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
                 >
                   <option value="">Select Shop</option>
-                  {shopNames?.map((shop, index) => (
-                    <option key={index} value={shop.shop_name}>
-                      {shop.shop_name}
-                    </option>
-                  ))}
+                  {shopNames && shopNames.length > 0 ? (
+                    shopNames.map((shop, index) => (
+                      <option key={index} value={shop.shop_name}>
+                        {shop.shop_name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No shops available</option>
+                  )}
                 </select>
               </div>
 
@@ -155,11 +178,15 @@ const ManagerLogin = () => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"
                 >
                   <option value="">Select Branch</option>
-                  {branches?.map((branch, index) => (
-                    <option key={index} value={branch.branch_name}>
-                      {branch.branch_name}
-                    </option>
-                  ))}
+                  {branches && branches.length > 0 ? (
+                    branches.map((branch, index) => (
+                      <option key={index} value={branch.branch_name}>
+                        {branch.branch_name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No branches available</option>
+                  )}
                 </select>
               </div>
             </div>

@@ -22,7 +22,8 @@ const AdminService = {
       });
       return handleResponse(response);
     } catch (error) {
-      return { error: error.message };
+      console.error("Error in getManagers:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 
@@ -36,7 +37,8 @@ const AdminService = {
       });
       return handleResponse(response);
     } catch (error) {
-      return { error: error.message };
+      console.error("Error in getBranches:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 
@@ -50,7 +52,8 @@ const AdminService = {
       });
       return handleResponse(response);
     } catch (error) {
-      return { error: error.message };
+      console.error("Error in getCategories:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 
@@ -68,7 +71,28 @@ const AdminService = {
       );
       return handleResponse(response);
     } catch (error) {
-      return "error";
+      console.error("Error in addManager:", error);
+      return { error: error.response?.data?.message || error.message };
+    }
+  },
+  
+  addCategory: async (categoryData) => {
+    try {
+      // No need to include shopId - backend will get it from token
+      const response = await axios.post(
+        `${BASE_URL}/admin/category/add`,
+        { categoryName: categoryData.categoryName },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      console.error("Error adding category:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 
@@ -86,7 +110,8 @@ const AdminService = {
       );
       return handleResponse(response);
     } catch (error) {
-      return "error";
+      console.error("Error in addBranch:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 
@@ -100,7 +125,8 @@ const AdminService = {
       });
       return handleResponse(response);
     } catch (error) {
-      return { error: error.message };
+      console.error("Error in getAllOrders:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 
@@ -114,7 +140,8 @@ const AdminService = {
       });
       return handleResponse(response);
     } catch (error) {
-      return { error: error.message };
+      console.error("Error in getAllProducts:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 
@@ -128,7 +155,8 @@ const AdminService = {
       });
       return handleResponse(response);
     } catch (error) {
-      return { error: error.message };
+      console.error("Error in getNumberOfBranches:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 
@@ -142,7 +170,8 @@ const AdminService = {
       });
       return handleResponse(response);
     } catch (error) {
-      return { error: error.message };
+      console.error("Error in getBranchSales:", error);
+      return { error: error.response?.data?.message || error.message };
     }
   },
 };
