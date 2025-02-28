@@ -174,6 +174,50 @@ const AdminService = {
       return { error: error.response?.data?.message || error.message };
     }
   },
+  // Add these methods to your AdminService.js file
+
+updateCategory: async (categoryData) => {
+  try {
+    console.log("Updating category:", categoryData);
+    const response = await axios.put(
+      `${BASE_URL}/admin/category/update`,
+      {
+        categoryId: categoryData.categoryId,
+        categoryName: categoryData.categoryName,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error updating category:", error);
+    return { error: error.response?.data?.message || error.message };
+  }
+},
+
+deleteCategory: async (categoryId) => {
+  try {
+    console.log("Deleting category:", categoryId);
+    const response = await axios.delete(
+      `${BASE_URL}/admin/category/delete`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+        data: { categoryId }
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    return { error: error.response?.data?.message || error.message };
+  }
+}
 };
 
 export default AdminService;

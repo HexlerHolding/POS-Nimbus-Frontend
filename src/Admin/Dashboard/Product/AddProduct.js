@@ -1,6 +1,6 @@
 import axios from "axios"; // Import axios to manually add category if needed
 import React, { useEffect, useState } from "react";
-import { FiChevronDown } from "react-icons/fi"; // Import dropdown icon
+import { FiChevronDown, FiEdit, FiTrash2 } from "react-icons/fi"; // Import icons
 import AdminService from "../../../Services/adminService";
 import ManagerService from "../../../Services/managerService";
 
@@ -12,11 +12,17 @@ const AddProduct = () => {
   const [price, setPrice] = useState("");
   const [categories, setCategories] = useState([]);
   
-  // New state for adding a new category
+  // New state for adding and editing categories
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [addingCategory, setAddingCategory] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [error, setError] = useState("");
+  
+  // State for confirmation dialog
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const clearForm = () => {
     setName("");
@@ -83,12 +89,28 @@ const AddProduct = () => {
   const toggleNewCategoryInput = () => {
     console.log("Toggling new category input. Current state:", showNewCategoryInput);
     setShowNewCategoryInput(!showNewCategoryInput);
+    setEditingCategory(false);
+    setNewCategoryName("");
+    setSelectedCategoryId("");
+    
     if (!showNewCategoryInput) {
       setTimeout(() => {
         const input = document.getElementById("new_category");
         if (input) input.focus();
       }, 100);
     }
+  };
+
+  const startEditCategory = (categoryId, categoryName) => {
+    setShowNewCategoryInput(true);
+    setEditingCategory(true);
+    setSelectedCategoryId(categoryId);
+    setNewCategoryName(categoryName);
+    
+    setTimeout(() => {
+      const input = document.getElementById("new_category");
+      if (input) input.focus();
+    }, 100);
   };
 
   // Try to get shopId from JWT token
@@ -112,6 +134,12 @@ const AddProduct = () => {
     setError("");
     if (!newCategoryName.trim()) {
       setError("Please enter a category name");
+      return;
+    }
+
+    if (editingCategory) {
+      // Handle category update
+      handleUpdateCategory();
       return;
     }
 
@@ -175,6 +203,69 @@ const AddProduct = () => {
       setError("Failed to add category: " + (error.message || "Unknown error"));
     } finally {
       setAddingCategory(false);
+    }
+  };
+
+  const handleUpdateCategory = async () => {
+    setAddingCategory(true);
+    
+    try {
+      const result = await AdminService.updateCategory({
+        categoryId: selectedCategoryId,
+        categoryName: newCategoryName
+      });
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      fetchCategories();
+      setCategory(newCategoryName);
+      setNewCategoryName("");
+      setShowNewCategoryInput(false);
+      setEditingCategory(false);
+      setSelectedCategoryId("");
+      alert("Category updated successfully!");
+    } catch (error) {
+      console.error("Error updating category:", error);
+      setError("Failed to update category: " + (error.message || "Unknown error"));
+    } finally {
+      setAddingCategory(false);
+    }
+  };
+
+  // Open confirmation dialog for category deletion
+  const confirmDeleteCategory = (categoryId, categoryName) => {
+    setCategoryToDelete({ id: categoryId, name: categoryName });
+    setShowConfirmation(true);
+  };
+
+  // Proceed with actual deletion
+  const handleDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+    
+    try {
+      const result = await AdminService.deleteCategory(categoryToDelete.id);
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      fetchCategories();
+      
+      // Reset selected category if it was the deleted one
+      if (category === categoryToDelete.name) {
+        setCategory("");
+      }
+      
+      alert("Category deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      setError("Failed to delete category: " + (error.message || "Unknown error"));
+    } finally {
+      // Close confirmation dialog
+      setShowConfirmation(false);
+      setCategoryToDelete(null);
     }
   };
 
@@ -249,7 +340,7 @@ const AddProduct = () => {
         </label>
       </div>
       
-      {/* Category Selection with Add New Option */}
+      {/* Category Selection with Add/Edit/Delete Options */}
       <div className="relative z-0 w-full mb-5 group">
         {!showNewCategoryInput ? (
           <div className="flex items-end space-x-2">
@@ -309,7 +400,7 @@ const AddProduct = () => {
                 htmlFor="new_category"
                 className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
               >
-                New Category Name
+                {editingCategory ? "Edit Category Name" : "New Category Name"}
               </label>
             </div>
             <div className="flex space-x-2">
@@ -319,7 +410,7 @@ const AddProduct = () => {
                 onClick={handleAddCategory}
                 disabled={addingCategory}
               >
-                {addingCategory ? "Adding..." : "Add"}
+                {addingCategory ? "Saving..." : editingCategory ? "Update" : "Add"}
               </button>
               <button
                 type="button"
@@ -327,6 +418,8 @@ const AddProduct = () => {
                 onClick={() => {
                   setShowNewCategoryInput(false);
                   setNewCategoryName("");
+                  setEditingCategory(false);
+                  setSelectedCategoryId("");
                 }}
                 disabled={addingCategory}
               >
@@ -336,6 +429,9 @@ const AddProduct = () => {
           </div>
         )}
       </div>
+      
+      {/* Category Management Section */}
+      
       
       <div className="relative z-0 w-full mb-5 group">
         <input
@@ -362,6 +458,79 @@ const AddProduct = () => {
       >
         Add Product
       </button>
+      {Array.isArray(categories) && categories.length > 0 && !showNewCategoryInput && (
+        <div className="mb-6 bg-white p-4 my-10 ">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Category Management</h3>
+          <div className="max-h-40 overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 px-1">Category Name</th>
+                  <th className="text-right py-2 px-1">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categories.map(cat => (
+                  <tr key={cat._id} className="border-b border-gray-100">
+                    <td className="py-2 px-1">{cat.category_name}</td>
+                    <td className="text-right py-2 px-1">
+                      <button
+                        type="button"
+                        className="text-blue-500 hover:text-blue-700 mx-1"
+                        onClick={() => startEditCategory(cat._id, cat.category_name)}
+                        title="Edit Category"
+                      >
+                        <FiEdit size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        className="text-red-500 hover:text-red-700 mx-1"
+                        onClick={() => confirmDeleteCategory(cat._id, cat.category_name)}
+                        title="Delete Category"
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      {showConfirmation && categoryToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4  z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Confirm Delete</h3>
+            <p className="mb-6 text-gray-600">
+              Are you sure you want to delete category "{categoryToDelete.name}"?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                onClick={() => {
+                  setShowConfirmation(false);
+                  setCategoryToDelete(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                onClick={handleDeleteCategory}
+              >
+                Delete
+              </button>
+            </div>
+            
+          </div>
+          
+        </div>
+      )}
     </form>
   );
 };
