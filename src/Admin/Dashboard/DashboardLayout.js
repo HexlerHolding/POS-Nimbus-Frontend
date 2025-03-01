@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineBranches } from "react-icons/ai";
-import { BiLogOut } from "react-icons/bi";
+import { BiLogOut, BiUser } from "react-icons/bi";
 import { FaBars } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
 import Logo from "../../Assets/LogoWhite.png";
 import pfp2 from "../../Assets/pfp2.jpeg";
-
+import AdminService from "../../Services/adminService";
 import BranchPage from "./BranchManagement/ViewBranches";
 import ManagerManagement from "./ManagerManagement/page";
 import Order from "./Orders/order";
 import Dashboard from "./page";
 import ProductPage from "./Product/page";
+import AdminProfile from "./Profile/AdminProfile";
 
 import AuthService from "../../Services/authService";
 import useStore from "../../Store/store";
@@ -19,11 +20,26 @@ const DashboardLayout = () => {
   const [show, handleShow] = useState(false);
   const [showUser, handleShowUser] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const [adminProfile, setAdminProfile] = useState(null);
   const { userRole, setUserRole } = useStore();
 
   useEffect(() => {
     if (!userRole || userRole === "null" || userRole !== "admin") {
       window.location.href = "/login";
+    } else {
+      // Fetch admin profile when logged in
+      const fetchAdminProfile = async () => {
+        try {
+          const response = await AdminService.getAdminProfile();
+          if (response.data) {
+            setAdminProfile(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching admin profile:", error);
+        }
+      };
+
+      fetchAdminProfile();
     }
   }, [userRole]);
 
@@ -39,132 +55,59 @@ const DashboardLayout = () => {
   };
 
   return userRole !== "admin" ? null : (
-    <div>
-      <nav className="bg-white border-gray-200 dark:bg-gray-100">
-        <div className="flex items-center justify-between p-4">
-          {/* Left Section: Hamburger Menu and Logo */}
-          <div className="flex items-center">
-            {/* Hamburger Menu */}
-            <button
-              type="button"
-              className="text-gray-500 hover:text-gray-700 focus:outline-none mr-3"
-              onClick={() => handleShow(!show)}
-            >
-              <FaBars className="h-6 w-6" />
-            </button>
-            {/* Nimbus Logo */}
-            <a className="flex items-center space-x-3">
-              <img src={Logo} className="h-8" alt="Nimbus360 Logo" />
-              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-gray-800">
-                Nimbus<span className="text-blue-500">360</span>
-              </span>
-            </a>
-          </div>
-          {/* Right Section: User Profile */}
-          <div className="flex items-center gap-5">
-            <button
-              type="button"
-              className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-              onClick={() => handleShowUser(!showUser)}
-            >
-              <span className="sr-only">Open user menu</span>
-              <img className="w-8 h-8 rounded-full" src={pfp2} alt="User photo" />
-            </button>
-            {/* User Dropdown */}
-            {showUser && (
-              <div className="absolute right-10 top-14 z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
-                <div className="px-4 py-3">
-                  <span className="block text-sm text-gray-900 dark:text-white">
-                    Bonnie Green
-                  </span>
-                  <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                    name@flowbite.com
-                  </span>
-                </div>
-                <ul className="py-2">
-                  <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                    >
-                      Dashboard
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                    >
-                      Settings
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                    >
-                      Earnings
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                      onClick={handleLogout}
-                    >
-                      Sign out
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-        {/* Render the selected page */}
-        {selected === "Dashboard" && <Dashboard />}
-        {selected === "Orders" && <Order />}
-        {selected === "Manager Management" && <ManagerManagement />}
-        {selected === "Branch Management" && <BranchPage />}
-        {selected === "Products" && <ProductPage />}
-      </nav>
+    <div className="flex h-screen w-full overflow-hidden">
       {/* Side Menu */}
       <div
-        id="drawer-navigation"
-        className={`fixed z-50 top-0 left-0 w-64 h-screen p-4 overflow-y-auto transition-transform ${
-          show ? "translate-x-0" : "-translate-x-full"
-        } shadow-2xl border-r-4 border-gray-600`}
+        className={`h-screen overflow-y-auto transition-all duration-300 ease-in-out ${
+          show ? "w-64 p-4 shadow-2xl border-r-4 border-gray-600" : "w-0 p-0 border-0"
+        } shrink-0`}
         style={{ backgroundColor: "#3a6ddf" }}
       >
-        <h5
-          id="drawer-navigation-label"
-          className="text-base font-semibold text-white uppercase"
-        >
-          Menu
-        </h5>
-        <div className="mt-10 mb-4 flex justify-center">
-          <img src={Logo} alt="logo" className="w-20 h-20" />
-        </div>
-        <button
-          onClick={() => handleShow(!show)}
-          type="button"
-          className="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5"
-        >
-          <svg
-            aria-hidden="true"
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            ></path>
-          </svg>
-          <span className="sr-only">Close menu</span>
-        </button>
-        <div className="py-4 overflow-y-auto">
-          <ul className="space-y-2 font-medium">
+        {show && (
+          <>
+            <div className="flex justify-between items-center mb-4">
+              <h5 className="text-base font-semibold text-white uppercase">
+                Menu
+              </h5>
+              <button
+                onClick={() => handleShow(!show)}
+                type="button"
+                className="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+                <span className="sr-only">Close menu</span>
+              </button>
+            </div>
+            <div className="mt-10 mb-4 flex justify-center">
+              <img src={Logo} alt="logo" className="w-20 h-20" />
+            </div>
+          </>
+        )}
+        {show && (
+          <div className="relative">
+            <button
+              onClick={() => handleShow(!show)}
+              type="button"
+              className="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-0 right-0"
+            >
+              
+            </button>
+          </div>
+        )}
+        {show && (
+          <div className="py-4 overflow-y-auto">
+            <ul className="space-y-2 font-medium">
             <li>
               <a
                 href="#"
@@ -269,6 +212,16 @@ const DashboardLayout = () => {
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                onClick={() => setSelected("Profile")}
+              >
+                <BiUser className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
+                <span className="ms-3">Profile</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                 onClick={handleLogout}
               >
                 <BiLogOut className="w-5 h-5 text-white transition duration-75 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white" />
@@ -276,6 +229,91 @@ const DashboardLayout = () => {
               </a>
             </li>
           </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Main Content */}
+      <div className="flex flex-col flex-grow overflow-x-hidden overflow-y-auto">
+        <nav className="bg-white border-gray-200 dark:bg-gray-100">
+          <div className="flex items-center justify-between p-4 mx-0">
+            {/* Left Section: Hamburger Menu and Logo */}
+            <div className="flex items-center">
+              {/* Hamburger Menu */}
+              <button
+                type="button"
+                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                onClick={() => handleShow(!show)}
+              >
+                <FaBars className="h-6 w-6" />
+              </button>
+              {/* Nimbus Logo */}
+              <a className="flex items-center space-x-3">
+                <img src={Logo} className="h-8" alt="Nimbus360 Logo" />
+                <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-gray-800">
+                  Nimbus<span className="text-blue-500">360</span>
+                </span>
+              </a>
+            </div>
+            {/* Right Section: User Profile */}
+            <div className="flex items-center gap-5 relative">
+              <button
+                type="button"
+                className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                onClick={() => handleShowUser(!showUser)}
+              >
+                <span className="sr-only">Open user menu</span>
+                <img className="w-8 h-8 rounded-full" src={pfp2} alt="User photo" />
+              </button>
+              {/* User Dropdown */}
+              {showUser && (
+                <div className="absolute right-0 top-10 z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
+                  <div className="px-4 py-3">
+                    <span className="block text-sm text-gray-900 dark:text-white">
+                      {adminProfile 
+                        ? `${adminProfile.admin.first_name} ${adminProfile.admin.last_name}` 
+                        : 'Loading...'}
+                    </span>
+                    <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
+                      {adminProfile 
+                        ? adminProfile.admin.email 
+                        : 'Loading...'}
+                    </span>
+                  </div>
+                  <ul className="py-2">
+                    <li>
+                      <a
+                        href="#"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        onClick={() => setSelected("Profile")}
+                      >
+                        Profile
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        onClick={handleLogout}
+                      >
+                        Sign out
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </nav>
+
+        {/* Render the selected page */}
+        <div className="flex-grow overflow-x-hidden">
+          {selected === "Dashboard" && <Dashboard />}
+          {selected === "Orders" && <Order />}
+          {selected === "Manager Management" && <ManagerManagement />}
+          {selected === "Branch Management" && <BranchPage />}
+          {selected === "Products" && <ProductPage />}
+          {selected === "Profile" && <AdminProfile />}
         </div>
       </div>
     </div>

@@ -305,27 +305,22 @@ const Order = () => {
           show: true,
         },
       },
-      // maintainAspectRatio: false,
-      dataLabels: {
-        enabled: false,
-      },
       series: [
         ordersByType[0].total,
         ordersByType[1].total,
         ordersByType[2].total,
       ],
-      labels: ["delivery", "takeaway", "dine-in"],
+      labels: ["Delivery", "Takeaway", "Dine-in"],
       colors: ["#1A56DB", "#F87171", "#34D399"],
-      //change label colors
-
+      dataLabels: {
+        enabled: false,
+      },
       legend: {
         show: true,
-        //change legend colors
+        position: "bottom",
         labels: {
           colors: "#000000",
         },
-        //change where the legend is placed to bottom
-        position: "bottom",
       },
       plotOptions: {
         pie: {
@@ -334,29 +329,37 @@ const Order = () => {
               show: true,
               name: {
                 show: true,
-                color: "#000000", // Change this to your desired color
+                color: "#000000",
+                fontSize: '14px',
               },
               value: {
                 show: true,
-                color: "#000000", // Change this to your desired color
+                color: "#000000",
+                fontSize: '12px',
+                formatter: (val) => `${val}%`,
               },
               total: {
                 show: true,
-                color: "#000000", // Change this to your desired color
+                label: 'Total',
+                color: "#000000",
+                formatter: (w) => {
+                  const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                  return `${total}%`;
+                },
               },
             },
           },
         },
       },
     };
-
+  
     const chart = new ApexCharts(
       document.getElementById("donut-chart"),
       options
     );
-
+  
     chart.render();
-
+  
     // Clean up the chart instance on component unmount
     return () => {
       chart.destroy();
@@ -392,25 +395,12 @@ const Order = () => {
     }
     const options = {
       chart: {
+        height: "100%",
         type: "pie",
         fontFamily: "Inter, sans-serif",
         toolbar: {
           show: true,
         },
-        height: "100%",
-        responsive: [
-          {
-            breakpoint: 640,
-            options: {
-              chart: {
-                height: "100%",
-              },
-              legend: {
-                position: "bottom",
-              },
-            },
-          },
-        ],
       },
       colors: ["#1A56DB", "#F87171", "#34D399", "#FBBF24", "#818CF8"],
       labels: top3Products,
@@ -422,23 +412,45 @@ const Order = () => {
         },
       },
       series: productQuantities,
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: "100%",
-            },
-            legend: {
-              position: "bottom",
-            },
-          },
+      dataLabels: {
+        enabled: true,
+        formatter: function(val) {
+          return val.toFixed(1) + "%";
         },
-      ],
+        style: {
+          fontSize: '12px',
+          fontFamily: 'Inter, sans-serif',
+          fontWeight: 'bold',
+          colors: ['#fff']
+        },
+        dropShadow: {
+          enabled: true
+        },
+        offset: 0, // This ensures labels are centered in each slice
+        position: 'center' // This positions labels in the center of each slice
+      },
+      plotOptions: {
+        pie: {
+          customScale: 0.9, // Slightly reduce the size to give more room for labels
+          offsetX: 0,
+          offsetY: 0,
+          dataLabels: {
+            offset: -10, // Negative offset moves labels inward
+            minAngleToShowLabel: 10 // Only show labels for slices with angle > 10 degrees
+          }
+        }
+      },
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }]
     };
     const chart = new ApexCharts(document.getElementById("pie-chart"), options);
     chart.render();
-
     return () => {
       chart.destroy();
     };

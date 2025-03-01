@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import Logo from "../../Assets/Logo.png";
-import Line from "./Charts/line";
-import ExpenseChart from "./Charts/expenseChart";
-import Donut from "./Charts/donut";
-import Chart from "./Charts/chart";
+import React, { useEffect, useState } from "react";
 import AdminService from "../../Services/adminService";
+import Chart from "./Charts/chart";
+import Donut from "./Charts/donut";
+import ExpenseChart from "./Charts/expenseChart";
+import Line from "./Charts/line";
 
 const Dashboard = () => {
   const [orders, setOrders] = useState([]);
@@ -72,7 +71,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 p-5 w-full justify-between">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-5 w-full justify-between">
         <div
           className="relative flex p-5 rounded-lg shadow-md items-center gap-5 h-36 justify-between"
           style={{ background: "#2c302c" }}
@@ -123,7 +122,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 p-5 w-full justify-between">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 mx-0 p-5  justify-center">
         <Line />
         <Chart />
         <ExpenseChart />

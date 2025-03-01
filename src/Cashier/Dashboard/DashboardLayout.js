@@ -1,23 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { BiLogOut, BiUser } from "react-icons/bi";
+import { FaBars } from "react-icons/fa";
 import Logo from "../../Assets/LogoWhite.png";
 import pfp2 from "../../Assets/pfp2.jpeg";
-import { BiLogOut } from "react-icons/bi";
-import { FaBars } from "react-icons/fa"; // Import the hamburger icon
 
+import AuthService from "../../Services/authService";
+import cashierService from "../../Services/cashierService";
+import useStore from "../../Store/store";
 import Home from "./Home/page";
 import Orders from "./Orders/page";
-import useStore from "../../Store/store";
-import AuthService from "../../Services/authService";
+import CashierProfile from "./Profile/CashierProfile";
 
 const CashierDashboardLayout = () => {
   const [show, handleShow] = useState(false);
+  const [showUser, handleShowUser] = useState(false);
   const [selected, setSelected] = useState("Home");
+  const [cashierProfile, setCashierProfile] = useState(null);
   const { userRole, setUserRole } = useStore();
 
   useEffect(() => {
     console.log(userRole);
     if (userRole === "null" || userRole === null || userRole !== "cashier") {
       window.location.href = "/login";
+    } else {
+      // Fetch cashier profile when logged in
+      const fetchCashierProfile = async () => {
+        try {
+          const response = await cashierService.getCashierProfile();
+          if (response.data) {
+            setCashierProfile(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching cashier profile:", error);
+        }
+      };
+
+      fetchCashierProfile();
     }
   }, [userRole]);
 
@@ -61,12 +79,59 @@ const CashierDashboardLayout = () => {
           </div>
           {/* Right Section */}
           <div className="flex items-center gap-5">
-            {/* Add any right-side content here */}
+            <button
+              type="button"
+              className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+              onClick={() => handleShowUser(!showUser)}
+            >
+              <span className="sr-only">Open user menu</span>
+              <img 
+                className="w-8 h-8 rounded-full" 
+                src={cashierProfile?.shop?.logo || pfp2} 
+                alt="User photo" 
+              />
+            </button>
+            {/* User Dropdown */}
+            {showUser && (
+              <div className="absolute right-10 top-14 z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
+                <div className="px-4 py-3">
+                  <span className="block text-sm text-gray-900 dark:text-white">
+                    {cashierProfile 
+                      ? cashierProfile.cashier.username 
+                      : 'Loading...'}
+                  </span>
+                  <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
+                    Cashier
+                  </span>
+                </div>
+                <ul className="py-2">
+                  <li>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                      onClick={() => setSelected("Profile")}
+                    >
+                      Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                      onClick={handleLogout}
+                    >
+                      Sign out
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         </div>
         {/* Render the selected page */}
         {selected === "Home" && <Home />}
         {selected === "Orders" && <Orders />}
+        {selected === "Profile" && <CashierProfile />}
       </nav>
       {/* Sidebar Menu */}
       <div
@@ -83,7 +148,10 @@ const CashierDashboardLayout = () => {
           Menu
         </h5>
         <div className="mt-10 mb-4 flex justify-center">
-          <img src={Logo} alt="logo" className="w-20 h-20" />
+          <img src={cashierProfile?.shop?.logo || Logo} alt="logo" className="w-20 h-20 rounded-full bg-white p-2" />
+        </div>
+        <div className="text-white text-center mb-6 font-medium">
+          {cashierProfile?.cashier?.username || "Loading..."}
         </div>
         <button
           onClick={() => handleShow(!show)}
@@ -164,6 +232,20 @@ const CashierDashboardLayout = () => {
                 <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-yellow-800 bg-blue-100 rounded-full">
                   Coming soon
                 </span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#"
+                className="flex items-center p-2 text-white rounded-lg hover:bg-gray-100 hover:text-gray-900"
+                onClick={() => {
+                  setSelected("Profile");
+                  handleShow(false);
+                }}
+              >
+                <BiUser className="w-5 h-5 text-white transition duration-75" />
+                <span className="ml-3">Profile</span>
               </a>
             </li>
 

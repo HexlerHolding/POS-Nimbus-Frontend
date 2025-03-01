@@ -1,18 +1,19 @@
 import React from "react";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
-import Home from "./Home/page";
-import Contact from "./Home/contact";
-import AdminLogin from "./Admin/Login/page";
-import UserLogin from "./UserLogin/page";
 import DashboardLayout from "./Admin/Dashboard/DashboardLayout";
+import AdminLogin from "./Admin/Login/page";
 import CashierDashboardLayout from "./Cashier/Dashboard/DashboardLayout";
-import ManagerDashboardLayout from "./Manager/DashboardLayout";
-import Orders from "./Kitchen/Orders/page";
 import CashierLogin from "./Cashier/Login/page";
-import ManagerLogin from "./Manager/Login/page";
+import Contact from "./Home/contact";
+import Home from "./Home/page";
 import KitchenLogin from "./Kitchen/Login/page";
+import Orders from "./Kitchen/Orders/page";
 import Login from "./Login/login";
+import ManagerDashboardLayout from "./Manager/DashboardLayout";
+import ManagerLogin from "./Manager/Login/page";
+import Profile from "./Manager/Profile/ManagerProfile";
+import UserLogin from "./UserLogin/page";
 
 const Layout = () => {
   return (
@@ -29,6 +30,7 @@ const Layout = () => {
       <Route path="/cashier/dashboard" element={<CashierDashboardLayout />} />
       <Route path="/kitchen/orders" element={<Orders />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/profile" element={<Profile />} />
     </Routes>
   );
 };

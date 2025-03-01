@@ -385,11 +385,45 @@ const Order = () => {
         },
       },
       series: productQuantities,
-
+      dataLabels: {
+        enabled: true,
+        formatter: function(val) {
+          return val.toFixed(1) + "%";
+        },
+        style: {
+          fontSize: '12px',
+          fontFamily: 'Inter, sans-serif',
+          fontWeight: 'bold',
+          colors: ['#fff']
+        },
+        dropShadow: {
+          enabled: true
+        },
+        offset: 0, // This ensures labels are centered in each slice
+        position: 'center' // This positions labels in the center of each slice
+      },
+      plotOptions: {
+        pie: {
+          customScale: 0.9, // Slightly reduce the size to give more room for labels
+          offsetX: 0,
+          offsetY: 0,
+          dataLabels: {
+            offset: -10, // Negative offset moves labels inward
+            minAngleToShowLabel: 10 // Only show labels for slices with angle > 10 degrees
+          }
+        }
+      },
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }]
     };
     const chart = new ApexCharts(document.getElementById("pie-chart"), options);
     chart.render();
-
     return () => {
       chart.destroy();
     };

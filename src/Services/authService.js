@@ -54,6 +54,7 @@ const AuthService = {
       console.log(response);
       return handleResponse(response);
     } catch (error) {
+      console.error("Login error:", error);
       return "error";
     }
   },

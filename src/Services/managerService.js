@@ -12,6 +12,32 @@ const handleResponse = async (response) => {
 };
 
 const managerService = {
+  getManagerProfile: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/manager/profile`, {
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+  updateManagerProfile: async (profileData) => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/manager/profile/update`,
+        profileData,
+        {
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+
   addProduct: async (product) => {
     try {
       console.log(product);

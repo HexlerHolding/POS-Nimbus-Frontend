@@ -313,7 +313,50 @@ deleteCategory: async (categoryId) => {
     console.error("Error deleting category:", error);
     return { error: error.response?.data?.message || error.message };
   }
-}
+},
+/**
+ * Get admin profile information
+ * @returns {Promise} - Response with admin profile data
+ */
+getAdminProfile: async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/admin/profile`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error getting admin profile:", error);
+    return { error: error.response?.data?.message || error.message };
+  }
+},
+
+/**
+ * Update admin profile information
+ * @param {Object} adminData - Admin profile data to update
+ * @returns {Promise} - Response with updated admin data
+ */
+updateAdminProfile: async (adminData) => {
+  try {
+    console.log("Updating admin profile:", adminData);
+    const response = await axios.put(
+      `${BASE_URL}/admin/profile/update`,
+      adminData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error updating admin profile:", error);
+    return { error: error.response?.data?.message || error.message };
+  }
+},
 };
 
 export default AdminService;

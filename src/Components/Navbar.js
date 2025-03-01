@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Logo from "../Assets/Logo.png";
 
 const Navbar = () => {
@@ -9,6 +10,7 @@ const Navbar = () => {
     { href: "#features", text: "Features" },
     { href: "#pricing", text: "Pricing" },
     { href: "#contact", text: "Contact" },
+    { href: "/profile", text: "Profile" } // Add Profile link
   ];
 
   const toggleMenu = () => {
@@ -100,13 +102,23 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-black hover:text-gray-600 transition-colors"
-              >
-                {link.text}
-              </a>
+              link.href.startsWith('/') ? (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-black hover:text-gray-600 transition-colors"
+                >
+                  {link.text}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-black hover:text-gray-600 transition-colors"
+                >
+                  {link.text}
+                </a>
+              )
             ))}
             <button className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition-colors">
               Get Started
@@ -119,14 +131,25 @@ const Navbar = () => {
           <div className="lg:hidden pb-4">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="text-black hover:text-gray-600 transition-colors px-2 py-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.text}
-                </a>
+                link.href.startsWith('/') ? (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className="text-black hover:text-gray-600 transition-colors px-2 py-1"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.text}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="text-black hover:text-gray-600 transition-colors px-2 py-1"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.text}
+                  </a>
+                )
               ))}
               <button className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition-colors mt-2">
                 Get Started

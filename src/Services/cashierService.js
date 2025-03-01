@@ -123,6 +123,45 @@ const cashierService = {
       return { error: error.message };
     }
   },
+  getCashierProfile: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/cashier/profile`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error("Error getting cashier profile:", error);
+      return { error: error.response?.data?.message || error.message };
+    }
+  },
+  
+  /**
+   * Update cashier profile information
+   * @param {Object} profileData - Profile data to update (currently only password)
+   * @returns {Promise} - Response with updated cashier data
+   */
+  updateCashierProfile: async (profileData) => {
+    try {
+      console.log("Updating cashier profile:", profileData);
+      const response = await axios.put(
+        `${BASE_URL}/cashier/profile/update`,
+        profileData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      console.error("Error updating cashier profile:", error);
+      return { error: error.response?.data?.message || error.message };
+    }
+  }
 };
 
 export default cashierService;
