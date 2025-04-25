@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 
 import DashboardLayout from "./Admin/Dashboard/DashboardLayout";
 import AdminLogin from "./Admin/Login/page";
+import AllInOneLogin from "./AllInOne";
 import CashierDashboardLayout from "./Cashier/Dashboard/DashboardLayout";
 import CashierLogin from "./Cashier/Login/page";
 import Contact from "./Home/contact";
@@ -31,6 +32,8 @@ const Layout = () => {
       <Route path="/kitchen/orders" element={<Orders />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/allinone" element={<AllInOneLogin />} />
+
     </Routes>
   );
 };

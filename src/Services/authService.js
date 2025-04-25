@@ -25,8 +25,20 @@ const AuthService = {
           withCredentials: true,
         }
       );
-
+  
       console.log(response);
+      // Extract shopId and userId from response
+      if (response.status >= 200 && response.status < 300) {
+        const { shopId, userId } = response.data;
+        // Return these with the response for store updates
+        return { 
+          data: {
+            ...response.data,
+            shopId: shopId || response.data._id, // Fallback to _id if shopId is not provided
+            userId: userId || shopId // For admin, userId might be the same as shopId
+          } 
+        };
+      }
       return handleResponse(response);
     } catch (error) {
       return "error";
@@ -50,11 +62,22 @@ const AuthService = {
           withCredentials: true,
         }
       );
-
+  
       console.log(response);
+      // Extract needed IDs from response
+      if (response.status >= 200 && response.status < 300) {
+        const { shopId, branchId, userId } = response.data;
+        return { 
+          data: {
+            ...response.data,
+            shopId: shopId,
+            branchId: branchId,
+            userId: userId || response.data._id // Manager's ID
+          } 
+        };
+      }
       return handleResponse(response);
     } catch (error) {
-      console.error("Login error:", error);
       return "error";
     }
   },
@@ -63,31 +86,6 @@ const AuthService = {
       // console.log(name, password, shopName, branch);
       const response = await axios.post(
         `${BASE_URL}/auth/cashier/login`,
-        {
-          username: name,
-          password,
-          shopName,
-          branchName: branch,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-
-      console.log(response);
-      return handleResponse(response);
-    } catch (error) {
-      return "error";
-    }
-  },
-  kitchenLogin: async (name, password, shopName, branch) => {
-    try {
-      // console.log(name, password, shopName, branch);
-      const response = await axios.post(
-        `${BASE_URL}/auth/kitchen/login`,
         {
           username: name,
           password,
@@ -120,7 +118,14 @@ const AuthService = {
           withCredentials: true,
         }
       );
-
+  
+      // Make sure to clear all user data from the store on logout
+      localStorage.removeItem('userId');
+      localStorage.removeItem('shopId');
+      localStorage.removeItem('branchId');
+      localStorage.removeItem('shopName');
+      localStorage.removeItem('branchName');
+  
       console.log(response);
       return handleResponse(response);
     } catch (error) {
