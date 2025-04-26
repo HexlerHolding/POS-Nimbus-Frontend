@@ -36,7 +36,35 @@ const managerService = {
       return { error: error.message };
     }
   },
+  updateProduct: async (productData) => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/admin/product/update`,
+        productData,
+        {
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
 
+  deleteProduct: async (productId) => {
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/admin/product/delete`,
+        {
+          data: { productId },
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
 
   addProduct: async (product) => {
     try {
