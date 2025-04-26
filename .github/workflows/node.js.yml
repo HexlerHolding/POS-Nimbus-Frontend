@@ -3,7 +3,7 @@ name: Deploy React Frontend to HosterPK via FTP
 on:
   push:
     branches:
-      - main  # or your deployment branch
+      - main
 
 jobs:
   build-and-deploy:
@@ -31,5 +31,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./build/
-          server-dir: /  # or your target folder on hosting
-
+          server-dir: /  # or /public_html/ if needed
