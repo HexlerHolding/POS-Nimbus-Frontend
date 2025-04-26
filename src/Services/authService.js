@@ -46,7 +46,11 @@ const AuthService = {
   },
   managerLogin: async (name, password, shopName, branch) => {
     try {
-      console.log(name, password, shopName, branch);
+      console.log("AuthService sending:", {
+        username: name,
+        shopName,
+        branchName: branch
+      });
       const response = await axios.post(
         `${BASE_URL}/auth/manager/login`,
         {

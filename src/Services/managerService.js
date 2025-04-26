@@ -51,20 +51,7 @@ const managerService = {
     }
   },
 
-  deleteProduct: async (productId) => {
-    try {
-      const response = await axios.delete(
-        `${BASE_URL}/admin/product/delete`,
-        {
-          data: { productId },
-          withCredentials: true,
-        }
-      );
-      return handleResponse(response);
-    } catch (error) {
-      return { error: error.message };
-    }
-  },
+ 
 
   addProduct: async (product) => {
     try {
@@ -255,6 +242,101 @@ const managerService = {
       return "error";
     }
   },
+  
+addCategory: async (categoryData) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/manager/category/add`,
+      categoryData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Add category error:", error.response?.data || error.message);
+    return { error: error.response?.data?.message || error.message };
+  }
+},
+
+updateCategory: async (categoryData) => {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/manager/category/update`,
+      categoryData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Update category error:", error.response?.data || error.message);
+    return { error: error.response?.data?.message || error.message };
+  }
+},
+
+deleteCategory: async (categoryId) => {
+  try {
+    const response = await axios.delete(
+      `${BASE_URL}/manager/category/delete/${categoryId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Delete category error:", error.response?.data || error.message);
+    return { error: error.response?.data?.message || error.message };
+  }
+},
+// Add or update these functions in managerService.js
+
+updateProduct: async (productData) => {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/manager/product/update`,
+      productData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Update product error:", error.response?.data || error.message);
+    return { error: error.response?.data?.message || error.message };
+  }
+},
+
+deleteProduct: async (productId) => {
+  try {
+    const response = await axios.delete(
+      `${BASE_URL}/manager/product/delete`,
+      {
+        data: { productId },
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Delete product error:", error.response?.data || error.message);
+    return { error: error.response?.data?.message || error.message };
+  }
+}
 };
 
 export default managerService;

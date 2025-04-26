@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
+import AdminService from "../../../Services/adminService";
 import ManagerService from "../../../Services/managerService";
+
 
 // Bind modal to app element for accessibility
 Modal.setAppElement("#root");
@@ -128,7 +130,7 @@ const ViewProducts = () => {
   const handleDeleteConfirm = () => {
     setLoading(true);
     
-    ManagerService.deleteProduct(currentProduct._id)
+    AdminService.deleteProduct(currentProduct._id)
       .then((response) => {
         if (response.error) {
           toast.error(response.error);

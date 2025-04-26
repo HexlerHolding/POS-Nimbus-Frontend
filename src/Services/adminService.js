@@ -56,6 +56,20 @@ const AdminService = {
       return { error: error.response?.data?.message || error.message };
     }
   },
+  deleteProduct: async (productId) => {
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/admin/product/delete`,
+        {
+          data: { productId },
+          withCredentials: true,
+        }
+      );
+      return handleResponse(response);
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
 
   addManager: async (manager) => {
     try {
