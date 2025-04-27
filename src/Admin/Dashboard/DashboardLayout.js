@@ -25,7 +25,7 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     if (!userRole || userRole === "null" || userRole !== "admin") {
-      window.location.href = "/login";
+      window.location.href = "/allinone";
     } else {
       // Fetch admin profile when logged in
       const fetchAdminProfile = async () => {

@@ -26,7 +26,7 @@ const ManagerProfile = () => {
           if (response.error.includes('Unauthorized') || response.error.includes('Token')) {
             // Clear user role and redirect to login
             setUserRole(null);
-            window.location.href = "/login";
+            window.location.href = "/allinone";
             return;
           }
         }

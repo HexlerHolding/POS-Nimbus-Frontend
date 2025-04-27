@@ -28,7 +28,7 @@ const ManagerDashboardLayout = () => {
 
   useEffect(() => {
     if (userRole === "null" || userRole === null || userRole !== "manager") {
-      window.location.href = "/login";
+      window.location.href = "/allinone";
     } else {
       // Fetch manager profile when logged in
       const fetchManagerProfile = async () => {
