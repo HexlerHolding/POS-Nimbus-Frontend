@@ -12,6 +12,10 @@ const AddProduct = () => {
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [categories, setCategories] = useState([]);
+  // State for CSV upload
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvError, setCsvError] = useState("");
+  const [uploadStatus, setUploadStatus] = useState(null);
   
   // New state for adding and editing categories
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
@@ -32,6 +36,9 @@ const AddProduct = () => {
     setDescription("");
     setCategory("");
     setPrice("");
+    setCsvFile(null);
+    setCsvError("");
+    setUploadStatus(null);
   };
 
   const fetchCategories = () => {
@@ -73,6 +80,29 @@ const AddProduct = () => {
     setImage(file);
   };
 
+  // Handle CSV file change
+  const handleCsvChange = (e) => {
+    const file = e.target.files[0];
+    
+    if (!file) {
+      setCsvFile(null);
+      setCsvError("");
+      return;
+    }
+    
+    // Check file type
+    if (file.type !== 'text/csv') {
+      setCsvError("Please select a valid CSV file");
+      setCsvFile(null);
+      e.target.value = "";
+      return;
+    }
+    
+    setCsvError("");
+    setCsvFile(file);
+    setUploadStatus(null);
+  };
+
   // Handle price input validation
   const handlePriceChange = (e) => {
     const value = e.target.value;
@@ -88,7 +118,6 @@ const AddProduct = () => {
     if (!isNaN(numValue) && numValue >= 0) {
       setPrice(value);
     }
-    // If negative or not a number, don't update state (keeps previous valid value)
   };
 
   const handleSubmit = (e) => {
@@ -146,6 +175,47 @@ const AddProduct = () => {
     });
   };
 
+  // Handle CSV upload
+  const handleCsvUpload = async (e) => {
+    e.preventDefault();
+    setError("");
+    setUploadStatus(null);
+
+    if (!csvFile) {
+      setCsvError("Please select a CSV file");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("csvFile", csvFile);
+
+      const response = await ManagerService.bulkUploadProducts(formData);
+      
+      if (response.error) {
+        setError("Failed to upload products: " + response.error);
+        return;
+      }
+
+      setUploadStatus({
+        message: response.data.message,
+        totalProcessed: response.data.totalProcessed,
+        successful: response.data.successful,
+        errors: response.data.errors,
+        errorDetails: response.data.errorDetails
+      });
+      
+      alert(`Bulk upload completed! ${response.data.successful} products added successfully.`);
+      
+      // Reset CSV file input
+      setCsvFile(null);
+      document.getElementById("floating_csv").value = "";
+    } catch (err) {
+      console.error("Error uploading CSV:", err);
+      setError("Failed to upload CSV file: " + (err.message || "Unknown error"));
+    }
+  };
+
   const toggleNewCategoryInput = () => {
     console.log("Toggling new category input. Current state:", showNewCategoryInput);
     setShowNewCategoryInput(!showNewCategoryInput);
@@ -176,7 +246,6 @@ const AddProduct = () => {
   // Try to get shopId from JWT token
   const getShopIdFromToken = async () => {
     try {
-      // Make a simple request to get shop info which should contain shopId
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin`, {
         withCredentials: true
       });
@@ -198,7 +267,6 @@ const AddProduct = () => {
     }
 
     if (editingCategory) {
-      // Handle category update
       handleUpdateCategory();
       return;
     }
@@ -207,23 +275,18 @@ const AddProduct = () => {
     console.log("Adding new category:", newCategoryName);
 
     try {
-      // First try the standard way
       const result = await AdminService.addCategory({
         categoryName: newCategoryName
       });
 
-      // If we get shop_id error, try with explicit shopId
       if (result.error && result.error.includes("shop_id")) {
         console.log("Trying to add category with explicit shopId");
-        
-        // Get shopId from token
         const shopId = await getShopIdFromToken();
         
         if (!shopId) {
           throw new Error("Could not retrieve shop ID");
         }
         
-        // Make a direct request with shopId included
         const response = await axios.post(
           `${process.env.REACT_APP_BACKEND_URL}/admin/category/add`,
           { 
@@ -239,18 +302,14 @@ const AddProduct = () => {
         );
         
         console.log("Category added with explicit shopId:", response.data);
-        
-        // Success! Refresh categories
         fetchCategories();
         setCategory(newCategoryName);
         setNewCategoryName("");
         setShowNewCategoryInput(false);
         alert("Category added successfully!");
       } else if (result.error) {
-        // Other error occurred
         throw new Error(result.error);
       } else {
-        // Success with the standard approach
         console.log("Category added successfully:", result.data);
         fetchCategories();
         setCategory(newCategoryName);
@@ -294,13 +353,11 @@ const AddProduct = () => {
     }
   };
 
-  // Open confirmation dialog for category deletion
   const confirmDeleteCategory = (categoryId, categoryName) => {
     setCategoryToDelete({ id: categoryId, name: categoryName });
     setShowConfirmation(true);
   };
 
-  // Proceed with actual deletion
   const handleDeleteCategory = async () => {
     if (!categoryToDelete) return;
     
@@ -312,8 +369,6 @@ const AddProduct = () => {
       }
 
       fetchCategories();
-      
-      // Reset selected category if it was the deleted one
       if (category === categoryToDelete.name) {
         setCategory("");
       }
@@ -323,7 +378,6 @@ const AddProduct = () => {
       console.error("Error deleting category:", error);
       setError("Failed to delete category: " + (error.message || "Unknown error"));
     } finally {
-      // Close confirmation dialog
       setShowConfirmation(false);
       setCategoryToDelete(null);
     }
@@ -334,10 +388,10 @@ const AddProduct = () => {
   }, []);
 
   return (
-    <form className="p-10 sm:p-20 min-h-screen">
+    <div className="p-10 sm:p-20 min-h-screen">
       <h1 className="text-2xl text-blue-500 mb-2">Add Product</h1>
       <p className="text-gray-500 dark:text-gray-400 mb-4">
-        Fill in the details to add a new product
+        Add products individually or upload multiple products using a CSV file
       </p>
       
       {error && (
@@ -346,197 +400,269 @@ const AddProduct = () => {
         </div>
       )}
       
-      <div className="relative z-0 w-full mb-5 group">
-        <input
-          type="name"
-          name="floating_name"
-          id="floating_name"
-          className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-          placeholder=" "
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <label
-          htmlFor="floating_name"
-          className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-        >
-          Product Name
-        </label>
-      </div>
-      
-      {/* Image Upload with File Type Validation */}
-      <div className="relative z-0 w-full mb-5 group">
-        <input
-          type="file"
-          name="floating_image"
-          id="floating_image"
-          className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-          placeholder=" "
-          required
-          accept=".jpg,.jpeg,.png"
-          onChange={handleImageChange}
-        />
-        <label
-          htmlFor="floating_image"
-          className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-        >
-          Product Image (JPG, JPEG, PNG only)
-        </label>
-        {imageError && (
-          <p className="mt-1 text-xs text-red-500">{imageError}</p>
-        )}
-      </div>
-      
-      <div className="relative z-0 w-full mb-5 group">
-        <input
-          type="text"
-          name="floating_description"
-          id="floating_description"
-          className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-          placeholder=" "
-          required
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <label
-          htmlFor="floating_description"
-          className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-        >
-          Product Description
-        </label>
-      </div>
-      
-      {/* Category Selection with Add/Edit/Delete Options */}
-      <div className="relative z-0 w-full mb-5 group">
-        {!showNewCategoryInput ? (
-          <div className="flex items-end space-x-2">
-            <div className="flex-grow relative">
-              <select
-                name="floating_category"
-                id="floating_category"
-                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-8"
-                required
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option value="">Select Category</option>
-                {Array.isArray(categories) && categories.length > 0 ? (
-                  categories.map((cat) => (
-                    <option key={cat._id} value={cat.category_name}>
-                      {cat.category_name}
-                    </option>
-                  ))
-                ) : (
-                  <option disabled>No categories available</option>
-                )}
-              </select>
-              {/* Dropdown Icon */}
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <FiChevronDown size={16} />
+      {/* Single Product Form */}
+      <form className="mb-10">
+        <h2 className="text-lg text-blue-500 mb-4">Add Single Product</h2>
+        
+        <div className="relative z-0 w-full mb-5 group">
+          <input
+            type="name"
+            name="floating_name"
+            id="floating_name"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <label
+            htmlFor="floating_name"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Product Name
+          </label>
+        </div>
+        
+        <div className="relative z-0 w-full mb-5 group">
+          <input
+            type="file"
+            name="floating_image"
+            id="floating_image"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
+            accept=".jpg,.jpeg,.png"
+            onChange={handleImageChange}
+          />
+          <label
+            htmlFor="floating_image"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Product Image (JPG, JPEG, PNG only)
+          </label>
+          {imageError && (
+            <p className="mt-1 text-xs text-red-500">{imageError}</p>
+          )}
+        </div>
+        
+        <div className="relative z-0 w-full mb-5 group">
+          <input
+            type="text"
+            name="floating_description"
+            id="floating_description"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <label
+            htmlFor="floating_description"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Product Description
+          </label>
+        </div>
+        
+        <div className="relative z-0 w-full mb-5 group">
+          {!showNewCategoryInput ? (
+            <div className="flex items-end space-x-2">
+              <div className="flex-grow relative">
+                <select
+                  name="floating_category"
+                  id="floating_category"
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-8"
+                  required
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  <option value="">Select Category</option>
+                  {Array.isArray(categories) && categories.length > 0 ? (
+                    categories.map((cat) => (
+                      <option key={cat._id} value={cat.category_name}>
+                        {cat.category_name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No categories available</option>
+                  )}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <FiChevronDown size={16} />
+                </div>
+                <label
+                  htmlFor="floating_category"
+                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                >
+                  Category
+                </label>
               </div>
-              <label
-                htmlFor="floating_category"
-                className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-              >
-                Category
-              </label>
-            </div>
-            <button
-              type="button"
-              className="text-blue-500 hover:text-blue-700 font-medium text-sm py-2.5"
-              onClick={toggleNewCategoryInput}
-            >
-              + Add New
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-end space-x-2">
-            <div className="flex-grow">
-              <input
-                type="text"
-                name="new_category"
-                id="new_category"
-                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                placeholder=" "
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                autoFocus
-              />
-              <label
-                htmlFor="new_category"
-                className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-              >
-                {editingCategory ? "Edit Category Name" : "New Category Name"}
-              </label>
-            </div>
-            <div className="flex space-x-2">
               <button
                 type="button"
-                className="text-green-500 hover:text-green-700 font-medium text-sm py-2.5"
-                onClick={handleAddCategory}
-                disabled={addingCategory}
+                className="text-blue-500 hover:text-blue-700 font-medium text-sm py-2.5"
+                onClick={toggleNewCategoryInput}
               >
-                {addingCategory ? "Saving..." : editingCategory ? "Update" : "Add"}
-              </button>
-              <button
-                type="button"
-                className="text-red-500 hover:text-red-700 font-medium text-sm py-2.5"
-                onClick={() => {
-                  setShowNewCategoryInput(false);
-                  setNewCategoryName("");
-                  setEditingCategory(false);
-                  setSelectedCategoryId("");
-                }}
-                disabled={addingCategory}
-              >
-                Cancel
+                + Add New
               </button>
             </div>
-          </div>
-        )}
-      </div>
-      
-      {/* Price Input with Validation */}
-      <div className="relative z-0 w-full mb-5 group">
-        <input
-          type="number"
-          name="floating_price"
-          id="floating_price"
-          min="0"
-          step="0.01"
-          className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-          placeholder=" "
-          required
-          value={price}
-          onChange={handlePriceChange}
-          onKeyDown={(e) => {
-            // Prevent minus sign and e (for scientific notation)
-            if (e.key === '-' || e.key === 'e') {
-              e.preventDefault();
-            }
-          }}
-        />
-        <label
-          htmlFor="floating_price"
-          className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          ) : (
+            <div className="flex items-end space-x-2">
+              <div className="flex-grow">
+                <input
+                  type="text"
+                  name="new_category"
+                  id="new_category"
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                  placeholder=" "
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  autoFocus
+                />
+                <label
+                  htmlFor="new_category"
+                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                >
+                  {editingCategory ? "Edit Category Name" : "New Category Name"}
+                </label>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  className="text-green-500 hover:text-green-700 font-medium text-sm py-2.5"
+                  onClick={handleAddCategory}
+                  disabled={addingCategory}
+                >
+                  {addingCategory ? "Saving..." : editingCategory ? "Update" : "Add"}
+                </button>
+                <button
+                  type="button"
+                  className="text-red-500 hover:text-red-700 font-medium text-sm py-2.5"
+                  onClick={() => {
+                    setShowNewCategoryInput(false);
+                    setNewCategoryName("");
+                    setEditingCategory(false);
+                    setSelectedCategoryId("");
+                  }}
+                  disabled={addingCategory}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div className="relative z-0 w-full mb-5 group">
+          <input
+            type="number"
+            name="floating_price"
+            id="floating_price"
+            min="0"
+            step="0.01"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
+            value={price}
+            onChange={handlePriceChange}
+            onKeyDown={(e) => {
+              if (e.key === '-' || e.key === 'e') {
+                e.preventDefault();
+              }
+            }}
+          />
+          <label
+            htmlFor="floating_price"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Price
+          </label>
+          <p className="mt-1 text-xs text-gray-500">Enter a positive price value (e.g., 9.99)</p>
+        </div>
+        
+        <button
+          type="submit"
+          className="w-full py-3 mt-10 bg-blue-500 rounded-md text-white text-sm hover:bg-blue-600"
+          onClick={handleSubmit}
         >
-          Price
-        </label>
-        {/* Addition of helper text */}
-        <p className="mt-1 text-xs text-gray-500">Enter a positive price value (e.g., 9.99)</p>
-      </div>
+          Add Product
+        </button>
+      </form>
       
-      <button
-        type="submit"
-        className="w-full py-3 mt-10 bg-blue-500 rounded-md text-white text-sm hover:bg-blue-600"
-        onClick={handleSubmit}
-      >
-        Add Product
-      </button>
+      {/* CSV Upload Form */}
+      <form className="mb-10">
+        <h2 className="text-lg text-blue-500 mb-4">Bulk Upload Products</h2>
+        
+        <div className="relative z-0 w-full mb-5 group">
+          <input
+            type="file"
+            name="floating_csv"
+            id="floating_csv"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            accept=".csv"
+            onChange={handleCsvChange}
+          />
+          <label
+            htmlFor="floating_csv"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            CSV File (name,description,price,category_name)
+          </label>
+          {csvError && (
+            <p className="mt-1 text-xs text-red-500">{csvError}</p>
+          )}
+          <p className="mt-1 text-xs text-gray-500">
+            CSV should have columns: name,description,price,category_name
+          </p>
+        </div>
+        
+        <button
+          type="submit"
+          className="w-full py-3 bg-green-500 rounded-md text-white text-sm hover:bg-green-600"
+          onClick={handleCsvUpload}
+        >
+          Upload CSV
+        </button>
+      </form>
       
+      {/* Upload Status Display */}
+      {uploadStatus && (
+        <div className="mb-6 bg-white p-4 rounded-md">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Upload Results</h3>
+          <p>Total Processed: {uploadStatus.totalProcessed}</p>
+          <p>Successfully Added: {uploadStatus.successful}</p>
+          <p>Errors: {uploadStatus.errors}</p>
+          {uploadStatus.errorDetails && uploadStatus.errorDetails.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Error Details:</h4>
+              <div className="max-h-40 overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 px-1">Row</th>
+                      <th className="text-left py-2 px-1">Error</th>
+                      <th className="text-left py-2 px-1">Data</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {uploadStatus.errorDetails.map((error, index) => (
+                      <tr key={index} className="border-b border-gray-100">
+                        <td className="py-2 px-1">{error.row}</td>
+                        <td className="py-2 px-1">{error.message}</td>
+                        <td className="py-2 px-1">{JSON.stringify(error.data)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Category Management Section */}
       {Array.isArray(categories) && categories.length > 0 && !showNewCategoryInput && (
-        <div className="mb-6 bg-white p-4 my-10 ">
+        <div className="mb-6 bg-white p-4 my-10">
           <h3 className="text-sm font-medium text-gray-700 mb-3">Category Management</h3>
           <div className="max-h-40 overflow-y-auto">
             <table className="w-full text-sm">
@@ -606,7 +732,7 @@ const AddProduct = () => {
           </div>
         </div>
       )}
-    </form>
+    </div>
   );
 };
 

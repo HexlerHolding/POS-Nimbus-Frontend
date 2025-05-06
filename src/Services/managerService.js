@@ -318,6 +318,23 @@ updateProduct: async (productData) => {
     return { error: error.response?.data?.message || error.message };
   }
 },
+bulkUploadProducts: async (formData) => {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/manager/products/bulk-upload`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+    return { data: response.data };
+  } catch (error) {
+    return { error: error.response?.data?.message || error.message };
+  }
+},
 
 deleteProduct: async (productId) => {
   try {

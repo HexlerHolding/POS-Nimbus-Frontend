@@ -87,7 +87,6 @@ const AuthService = {
   },
   cashierLogin: async (name, password, shopName, branch) => {
     try {
-      // console.log(name, password, shopName, branch);
       const response = await axios.post(
         `${BASE_URL}/auth/cashier/login`,
         {
@@ -105,6 +104,42 @@ const AuthService = {
       );
 
       console.log(response);
+      return handleResponse(response);
+    } catch (error) {
+      return "error";
+    }
+  },
+  kitchenLogin: async (name, password, shopName, branch) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/auth/kitchen/login`,
+        {
+          username: name,
+          password,
+          shopName,
+          branchName: branch,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+      // Extract needed IDs from response
+      if (response.status >= 200 && response.status < 300) {
+        const { shopId, branchId, userId } = response.data;
+        return { 
+          data: {
+            ...response.data,
+            shopId: shopId,
+            branchId: branchId,
+            userId: userId || response.data._id // Kitchen user's ID
+          } 
+        };
+      }
       return handleResponse(response);
     } catch (error) {
       return "error";
