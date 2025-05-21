@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { FiChevronDown, FiEdit, FiTrash2 } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { FiChevronDown, FiEdit, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 import AdminService from "../../../Services/adminService";
 import ManagerService from "../../../Services/managerService";
 
@@ -12,6 +12,12 @@ const AddProduct = () => {
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [categories, setCategories] = useState([]);
+  
+  // State for variations
+  const [variations, setVariations] = useState([]);
+  const [currentVariation, setCurrentVariation] = useState({ name: "", options: [{ name: "", additionalCharge: 0 }] });
+  const [showVariationForm, setShowVariationForm] = useState(false);
+  
   // State for CSV upload
   const [csvFile, setCsvFile] = useState(null);
   const [csvError, setCsvError] = useState("");
@@ -39,6 +45,9 @@ const AddProduct = () => {
     setCsvFile(null);
     setCsvError("");
     setUploadStatus(null);
+    setVariations([]);
+    setCurrentVariation({ name: "", options: [{ name: "", additionalCharge: 0 }] });
+    setShowVariationForm(false);
   };
 
   const fetchCategories = () => {
@@ -120,6 +129,96 @@ const AddProduct = () => {
     }
   };
 
+  // Variation handling functions
+  const handleVariationNameChange = (e) => {
+    setCurrentVariation({
+      ...currentVariation,
+      name: e.target.value
+    });
+  };
+
+  const handleOptionNameChange = (index, e) => {
+    const updatedOptions = [...currentVariation.options];
+    updatedOptions[index].name = e.target.value;
+    setCurrentVariation({
+      ...currentVariation,
+      options: updatedOptions
+    });
+  };
+
+  const handleAdditionalChargeChange = (index, e) => {
+    const value = e.target.value;
+    
+    // Allow empty string for better UX
+    if (value === "") {
+      const updatedOptions = [...currentVariation.options];
+      updatedOptions[index].additionalCharge = "";
+      setCurrentVariation({
+        ...currentVariation,
+        options: updatedOptions
+      });
+      return;
+    }
+    
+    // Convert to number and check if it's non-negative
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 0) {
+      const updatedOptions = [...currentVariation.options];
+      updatedOptions[index].additionalCharge = numValue;
+      setCurrentVariation({
+        ...currentVariation,
+        options: updatedOptions
+      });
+    }
+  };
+
+  const addOption = () => {
+    setCurrentVariation({
+      ...currentVariation,
+      options: [...currentVariation.options, { name: "", additionalCharge: 0 }]
+    });
+  };
+
+  const removeOption = (index) => {
+    if (currentVariation.options.length > 1) {
+      const updatedOptions = currentVariation.options.filter((_, i) => i !== index);
+      setCurrentVariation({
+        ...currentVariation,
+        options: updatedOptions
+      });
+    }
+  };
+
+  const addVariation = () => {
+    // Validate variation
+    if (!currentVariation.name) {
+      setError("Please enter a variation name");
+      return;
+    }
+    
+    if (currentVariation.options.some(option => !option.name)) {
+      setError("Please enter names for all options");
+      return;
+    }
+    
+    // Add variation to the list
+    setVariations([...variations, {...currentVariation}]);
+    
+    // Reset current variation
+    setCurrentVariation({ name: "", options: [{ name: "", additionalCharge: 0 }] });
+    setShowVariationForm(false);
+  };
+
+  const removeVariation = (index) => {
+    setVariations(variations.filter((_, i) => i !== index));
+  };
+
+  const editVariation = (index) => {
+    setCurrentVariation({...variations[index]});
+    setVariations(variations.filter((_, i) => i !== index));
+    setShowVariationForm(true);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
@@ -153,6 +252,11 @@ const AddProduct = () => {
     formData.append("description", description);
     formData.append("category", category);
     formData.append("price", price);
+    
+    // Add variations if any
+    if (variations.length > 0) {
+      formData.append("variations", JSON.stringify(variations));
+    }
 
     for (let pair of formData.entries()) {
       console.log(pair[0] + ": " + pair[1]);
@@ -579,6 +683,160 @@ const AddProduct = () => {
           <p className="mt-1 text-xs text-gray-500">Enter a positive price value (e.g., 9.99)</p>
         </div>
         
+        {/* Product Variations Section */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-md text-blue-500">Product Variations</h3>
+            {!showVariationForm && (
+              <button
+                type="button"
+                className="text-blue-500 hover:text-blue-700 font-medium text-sm flex items-center"
+                onClick={() => setShowVariationForm(true)}
+              >
+                <FiPlus className="mr-1" /> Add Variation
+              </button>
+            )}
+          </div>
+          
+          {/* Display existing variations */}
+          {variations.length > 0 && (
+            <div className="mb-5 space-y-4">
+              {variations.map((variation, variationIndex) => (
+                <div key={variationIndex} className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium">{variation.name}</h4>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        className="text-blue-500 hover:text-blue-700"
+                        onClick={() => editVariation(variationIndex)}
+                      >
+                        <FiEdit size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => removeVariation(variationIndex)}
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {variation.options.map((option, optionIndex) => (
+                      <div key={optionIndex} className="flex justify-between bg-white rounded p-2">
+                        <span>{option.name}</span>
+                        <span className="text-gray-600">
+                          {option.additionalCharge > 0 
+                            ? `+${option.additionalCharge.toFixed(2)}`
+                            : "No extra charge"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Variation form */}
+          {showVariationForm && (
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="font-medium">Add Variation</h4>
+                <button
+                  type="button"
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => {
+                    setShowVariationForm(false);
+                    setCurrentVariation({ name: "", options: [{ name: "", additionalCharge: 0 }] });
+                  }}
+                >
+                  <FiX size={18} />
+                </button>
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Variation Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="e.g., Size, Color, Flavor"
+                  value={currentVariation.name}
+                  onChange={handleVariationNameChange}
+                />
+              </div>
+              
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Options
+                  </label>
+                  <button
+                    type="button"
+                    className="text-blue-500 hover:text-blue-700 text-sm flex items-center"
+                    onClick={addOption}
+                  >
+                    <FiPlus className="mr-1" size={14} /> Add Option
+                  </button>
+                </div>
+                
+                {currentVariation.options.map((option, index) => (
+                  <div key={index} className="flex items-center space-x-3 mb-2">
+                    <div className="flex-grow">
+                      <input
+                        type="text"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="Option name (e.g., Small, Red, Vanilla)"
+                        value={option.name}
+                        onChange={(e) => handleOptionNameChange(index, e)}
+                      />
+                    </div>
+                    <div className="w-1/3">
+                      <div className="relative">
+                        <span className="absolute left-3 top-2">+</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="w-full p-2 pl-6 border border-gray-300 rounded-md"
+                          placeholder="Extra charge"
+                          value={option.additionalCharge}
+                          onChange={(e) => handleAdditionalChargeChange(index, e)}
+                          onKeyDown={(e) => {
+                            if (e.key === '-' || e.key === 'e') {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                    {currentVariation.options.length > 1 && (
+                      <button
+                        type="button"
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => removeOption(index)}
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              <button
+                type="button"
+                className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                onClick={addVariation}
+              >
+                {currentVariation.name ? `Add "${currentVariation.name}" Variation` : "Add Variation"}
+              </button>
+            </div>
+          )}
+        </div>
+        
         <button
           type="submit"
           className="w-full py-3 mt-10 bg-blue-500 rounded-md text-white text-sm hover:bg-blue-600"
@@ -613,6 +871,9 @@ const AddProduct = () => {
           )}
           <p className="mt-1 text-xs text-gray-500">
             CSV should have columns: name,description,price,category_name
+          </p>
+          <p className="mt-1 text-xs text-gray-500">
+            Note: Bulk upload currently doesn't support product variations. Add variations individually.
           </p>
         </div>
         

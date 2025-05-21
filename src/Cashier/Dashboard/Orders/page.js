@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BiSolidSleepy } from "react-icons/bi";
 import cashierService from "../../../Services/cashierService";
 import commonService from "../../../Services/common";
@@ -303,68 +303,77 @@ const Orders = () => {
             <p className="text-xl text-gray-500">No Orders Found</p>
           </div>
         )}
-        {filteredOrders.map((order, index) => (
-          <div
-            key={index}
-            className="relative w-full p-5 rounded-lg items-center gap-5 h-auto justify-between card border-dashed border-2 border-gray-300 cursor-default"
+       {filteredOrders.map((order, index) => (
+  <div
+    key={index}
+    className="relative w-full p-5 rounded-lg items-center gap-5 h-auto justify-between card border-dashed border-2 border-gray-300 cursor-default"
+  >
+    <div>
+      <div className="flex items-center justify-between">
+        <p className="font-semibold text-xl mb-10">
+          Order ID: {commonService.handleCode(order._id)}
+        </p>
+        <p
+          className={`text-md mb-10 border-2 px-2 rounded-full ${
+            order.status === "pending"
+              ? "bg-yellow-200 text-yellow-700"
+              : order.status === "completed"
+              ? "bg-green-200 text-green-800"
+              : order.status === "cancelled"
+              ? "bg-red-200 text-red-800"
+              : "bg-blue-200 text-blue-800"
+          }`}
+        >
+          {order.status}
+        </p>
+      </div>
+      <div className="flex text-md mb-5">
+        Customer Name:&nbsp;
+        <p className="font-semibold">{order.customer_name}</p>
+      </div>
+      {/* Add these new sections for address and phone */}
+      <div className="flex text-md mb-5">
+        Address:&nbsp;
+        <p className="font-semibold">{order.address || "N/A"}</p>
+      </div>
+      <div className="flex text-md mb-5">
+        Phone:&nbsp;
+        <p className="font-semibold">{order.customer_phone || "N/A"}</p>
+      </div>
+      <div className="flex text-md mb-5">
+        Order Date:&nbsp;
+        <p className="font-semibold">{order.time.split("T")[0]}</p>
+      </div>
+      <div className="flex text-md mb-5">
+        Order Time:&nbsp;
+        <p className="font-semibold">
+          {order.time.split("T")[1].split("Z")[0]}
+        </p>
+      </div>
+      <div className="w-full border-t-2 flex items-center p-2">
+        <div>
+          <p className="text-md">Total Amount: {order.total} /-</p>
+        </div>
+        <p className="text-sm ml-auto">Discount: {order.discount}%</p>
+        <p className="text-sm ml-auto">Tax: {order.tax}%</p>
+      </div>
+      <div className="w-full border-t-2 flex items-center p-2">
+        <p className="text-md p-2">
+          Grand Total:{" "}
+          {order.grand_total} /-
+        </p>
+        {order.status === "pending" && (
+          <button
+            className="text-blue-500 underline rounded-lg ml-auto"
+            onClick={() => handleCancelOrder(order._id)}
           >
-            <div>
-              <div className="flex items-center justify-between">
-                <p className="font-semibold text-xl mb-10">
-                  Order ID: {commonService.handleCode(order._id)}
-                </p>
-                <p
-                  className={`text-md mb-10 border-2 px-2 rounded-full ${
-                    order.status === "pending"
-                      ? "bg-yellow-200 text-yellow-700"
-                      : order.status === "completed"
-                      ? "bg-green-200 text-green-800"
-                      : order.status === "cancelled"
-                      ? "bg-red-200 text-red-800"
-                      : "bg-blue-200 text-blue-800"
-                  }`}
-                >
-                  {order.status}
-                </p>
-              </div>
-              <div className="flex text-md mb-5">
-                Customer Name:&nbsp;
-                <p className="font-semibold">{order.customer_name}</p>
-              </div>
-              <div className="flex text-md mb-5">
-                Order Date:&nbsp;
-                <p className="font-semibold">{order.time.split("T")[0]}</p>
-              </div>
-              <div className="flex text-md mb-5">
-                Order Time:&nbsp;
-                <p className="font-semibold">
-                  {order.time.split("T")[1].split("Z")[0]}
-                </p>
-              </div>
-              <div className="w-full border-t-2 flex items-center p-2">
-                <div>
-                  <p className="text-md">Total Amount: {order.total} /-</p>
-                </div>
-                <p className="text-sm ml-auto">Discount: {order.discount}%</p>
-                <p className="text-sm ml-auto">Tax: {order.tax}%</p>
-              </div>
-              <div className="w-full border-t-2 flex items-center p-2">
-                <p className="text-md p-2">
-                  Grand Total:{" "}
-                  {order.grand_total} /-
-                </p>
-                {order.status === "pending" && (
-                  <button
-                    className="text-blue-500 underline rounded-lg ml-auto"
-                    onClick={() => handleCancelOrder(order._id)}
-                  >
-                    Cancel Order
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+            Cancel Order
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+))}
       </div>
     </div>
   );

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Modal } from "react-bootstrap";
+import { BiMinus, BiPlus } from "react-icons/bi";
+import { BsCart } from "react-icons/bs";
+import { HiBadgeCheck } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCart,
+  clearCart,
   removeFromCart,
   updateQuantity,
-  clearCart,
 } from "../Redux/Actions";
-import { BiPlus } from "react-icons/bi";
-import { BiMinus } from "react-icons/bi";
-import { BsCart } from "react-icons/bs";
-import { HiBadgeCheck } from "react-icons/hi";
-import { Modal } from "react-bootstrap";
 
 import CashierService from "../../../Services/cashierService";
 
@@ -24,6 +23,8 @@ const Home = () => {
     order_type: "",
     tax: 0,
     payment_method: "",
+    customer_phone: "", // Add this line
+
   });
 
   const [products, setProducts] = useState([]);
@@ -160,39 +161,52 @@ const Home = () => {
   };
 
   const handleCheckout = async () => {
-    const order = {
-      products: cart.items,
-      total: cart.total,
-      grand_total: await grandTotal(cart.total, details.discount, details.tax),
-      customer_name: details.customerName,
-      payment_method: details.payment_method,
-      order_type: details.order_type,
-      tax: details.tax,
-      discount: details.discount,
-      address: details.address,
-    };
-    const response = await CashierService.addOrder(order);
-    if (response.error) {
-      console.log(response.error);
-    } else {
-      console.log(response.data);
-      setShowDetailsForm(false);
-      console.log(response.data);
-      setActiveOrders([...activeOrders, response.data.order]);
-      dispatch(clearCart());
-      //clear details
-      setDetails({
-        customerName: "",
-        discount: 0,
-        address: "",
-        order_type: "",
-        tax: 0,
-        payment_method: "",
-      });
-
-      setInBranch(true);
-    }
+  // Validate required fields
+  if (!details.customerName || !details.payment_method || !details.order_type) {
+    alert("Please fill in all required fields");
+    return;
+  }
+  
+  const order = {
+    products: cart.items,
+    total: cart.total,
+    grand_total: await grandTotal(cart.total, details.discount, details.tax),
+    customer_name: details.customerName,
+    payment_method: details.payment_method,
+    order_type: details.order_type,
+    tax: details.tax,
+    discount: details.discount,
+    address: details.address,
+    customer_phone: details.customer_phone, // Added the phone number field
   };
+  
+  // Make API call to backend
+  const response = await CashierService.addOrder(order);
+  
+  if (response.error) {
+    console.log(response.error);
+    alert("Error placing order: " + response.error.message);
+  } else {
+    console.log(response.data);
+    setShowDetailsForm(false);
+    console.log(response.data);
+    setActiveOrders([...activeOrders, response.data.order]);
+    dispatch(clearCart());
+    
+    // Clear details
+    setDetails({
+      customerName: "",
+      discount: 0,
+      address: "In Branch",
+      order_type: "",
+      tax: 0,
+      payment_method: "",
+      customer_phone: "", // Clear phone number field
+    });
+
+    setInBranch(true);
+  }
+};
 
   useEffect(() => {
     console.log(filteredProducts);
@@ -497,6 +511,21 @@ const Home = () => {
                       ...details,
                       address: e.target.value,
                     })
+                  }
+                />
+              </div>
+              {/* Add this inside the first flex div with customer name and address */}
+              <div className="mb-3 w-1/2">
+                <label htmlFor="customerPhone" className="form-label">
+                  Phone Number (Optional)
+                </label>
+                <input  
+                  type="text"
+                  className="form-control border border-gray-300 w-full p-2 rounded mt-2"
+                  id="customerPhone"
+                  value={details.customer_phone}
+                  onChange={(e) =>
+                    setDetails({ ...details, customer_phone: e.target.value })
                   }
                 />
               </div>
