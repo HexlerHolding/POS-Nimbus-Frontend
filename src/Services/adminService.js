@@ -58,6 +58,7 @@ const AdminService = {
   },
   deleteProduct: async (productId) => {
     try {
+      console.log("Deleting product:", productId);
       const response = await axios.delete(
         `${BASE_URL}/admin/product/delete`,
         {

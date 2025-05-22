@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import {
-    BiBuildingHouse,
-    BiLock,
-    BiStore,
-    BiUser,
-    BiWorld,
+  BiBuildingHouse,
+  BiLock,
+  BiStore,
+  BiUser,
+  BiWorld,
 } from "react-icons/bi";
 import { FaArrowRight, FaChartLine, FaSignInAlt } from "react-icons/fa";
 import LogoWhite1 from "./Assets/LogoWhite1.png";
@@ -81,7 +81,7 @@ const AllInOneLogin = () => {
   } = useStore();
 
   useEffect(() => {
-    if (role === "Cashier" || role === "Manager") {
+    if (role === "Cashier" || role === "Manager" || role === "Kitchen") {
       setLoading(true);
       AuthService.getShopNames()
         .then((res) => setShopNames(res))
@@ -167,6 +167,7 @@ const AllInOneLogin = () => {
         if (res === "error") {
           throw new Error("Invalid credentials");
         }
+      
         setUserRole(res.data.role);
         setUserId(res.data.userId);
         setShopId(res.data.shopId);
@@ -177,7 +178,23 @@ const AllInOneLogin = () => {
         setTimeout(() => {
           window.location.href = "/manager/dashboard";
         }, 1500);
+      } else if (role === "Kitchen") {
+        res = await AuthService.kitchenLogin(name, password, shopName, branch);
+        if (res === "error") {
+          throw new Error("Invalid credentials");
+        }
+        setUserRole(res.data.role);
+        setUserId(res.data.userId);
+        setShopId(res.data.shopId);
+        setUserShopName(shopName);
+        setBranchId(res.data.branchId);
+        setBranchName(branch);
+        showNotification("Login successful! Redirecting to dashboard...");
+        setTimeout(() => {
+          window.location.href = "/kitchen/orders";
+        }, 1500);
       }
+      
     } catch (error) {
       setError(error.message || "Login failed. Please check your credentials.");
       showNotification("Login failed. Please check your credentials.", "error");
@@ -375,6 +392,12 @@ const AllInOneLogin = () => {
                     isSelected={role === "Manager"}
                     onClick={() => setRole("Manager")}
                   />
+                  <RoleCard
+                    title="Kitchen Staff"
+                    icon={<FaChartLine />}
+                    isSelected={role === "Kitchen"}
+                    onClick={() => setRole("Kitchen")}
+                  />
                 </div>
               </div>
 
@@ -418,7 +441,7 @@ const AllInOneLogin = () => {
                     </div>
                   </div>
 
-                  {(role === "Cashier" || role === "Manager") && (
+                  {(role === "Cashier" || role === "Manager" || role === "Kitchen") && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-gray-700 font-medium mb-2">
