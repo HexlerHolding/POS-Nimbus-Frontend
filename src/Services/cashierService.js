@@ -14,6 +14,7 @@ const handleResponse = async (response) => {
 const cashierService = {
   addOrder: async (order) => {
     try {
+      console.log("base url", BASE_URL);
       console.log(order);
       const response = await axios.post(
         `${BASE_URL}/cashier/order/add`,
